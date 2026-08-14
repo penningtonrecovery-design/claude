@@ -24,3 +24,12 @@
 **Decision:** The "Get a quote" form submits via a `mailto:penningtonrecovery@gmail.com` action (enctype=text/plain) rather than a real form backend, since the deliverable is a single self-contained static HTML file with no server.
 **Reasoning:** User explicitly confirmed this is a known-temporary approach, to be replaced with a real form backend (e.g. Formspree/Netlify Forms) in a later step.
 **Context:** Flagged so a future session doesn't mistake the mailto action for the final intended form handling.
+
+## 2026-08-14 — Site hosted on GitHub Pages via Actions, auto-deploying from this branch
+**Decision:** The site is hosted at `https://penningtonrecovery-design.github.io/claude/`, deployed by `.github/workflows/deploy-pages.yml`. The workflow copies only `index.html` into a `_site` staging directory (keeping `CLAUDE.md` and `decisions/log.md` off the public site) and deploys it via `actions/configure-pages` + `actions/upload-pages-artifact` + `actions/deploy-pages`. It triggers on every push to `claude/pg-ai-consulting-site-q1qwwb`, so no manual redeploy step is needed going forward.
+**Reasoning:** User explicitly chose GitHub for hosting ("let's go with GitHub"). The repo is public, so Pages hosting is free.
+**Context:** First-time setup required three manual one-time changes in repo Settings that no API token (including admin-scoped ones) is allowed to make on a user's behalf — each was diagnosed from an actual failed deploy, not guessed upfront:
+1. **Settings → Pages → Source** = "GitHub Actions" (was unset; the default Actions token can deploy to an existing Pages site but cannot create one from scratch — `enablement: true` on `configure-pages` does not bypass this).
+2. **Settings → Actions → General → Workflow permissions** = "Read and write permissions" (was read-only, which silently caps the token below what the workflow's `permissions:` block requests).
+3. **Settings → Environments → github-pages → Deployment branches** = allow `claude/pg-ai-consulting-site-q1qwwb` (the auto-created `github-pages` environment defaults to only allowing the repo's default branch, which here is `claude/claude-md-confidence-rule-9kea8a`, not this branch).
+Only after all three were set did a deploy run (`run #8`, id `31845948025`) succeed. If the site ever goes dark after a settings change or repo transfer, re-check these three first.
