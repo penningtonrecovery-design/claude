@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f5f0;
+  --surface: #ffffff;
+  --ink: #101826;
+  --ink-muted: #4b5567;
+  --navy: #0f1f3d;
+  --navy-deep: #0a1529;
+  --gold: #b9873c;
+  --gold-soft: #f1e3c8;
+  --border: #e4e0d6;
+  --good: #1c8a5a;
+  --good-bg: #e7f5ee;
+  --needs-work: #b8791f;
+  --needs-work-bg: #fbf0dd;
+  --critical: #c13f2e;
+  --critical-bg: #fbe9e6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-navy: var(--navy);
+  --color-navy-deep: var(--navy-deep);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-border: var(--border);
+  --color-good: var(--good);
+  --color-good-bg: var(--good-bg);
+  --color-needs-work: var(--needs-work);
+  --color-needs-work-bg: var(--needs-work-bg);
+  --color-critical: var(--critical);
+  --color-critical-bg: var(--critical-bg);
+  --font-sans: var(--font-geist-sans);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a1120;
+    --surface: #101a2e;
+    --ink: #f1efe9;
+    --ink-muted: #a9b2c3;
+    --navy: #16294a;
+    --navy-deep: #0a1529;
+    --gold: #d6ab5f;
+    --gold-soft: #2a2314;
+    --border: #223055;
+    --good: #4fbf8a;
+    --good-bg: #113023;
+    --needs-work: #e0a94b;
+    --needs-work-bg: #382a10;
+    --critical: #e37260;
+    --critical-bg: #3a1712;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
