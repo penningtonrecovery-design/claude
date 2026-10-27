@@ -1,0 +1,83 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+
+export const metadata: Metadata = { title: "Privacy · Fatherly Friend" };
+
+const ROWS: { what: string; stored: string }[] = [
+  {
+    what: "Your account",
+    stored:
+      "Your email address and sign-in details, held by our authentication provider (Supabase). Passwords are stored as one-way hashes, never as text.",
+  },
+  {
+    what: "Your preferences",
+    stored:
+      "The name you'd like to be called (optional), whether memory is on, and when you confirmed you're 18+ and read how the app works.",
+  },
+  {
+    what: "Text conversations",
+    stored:
+      "Not saved by Fatherly Friend. Each message is sent to our AI provider (OpenAI) to write a reply, then kept only in your browser until you leave the page. We ask OpenAI not to store responses, but their own policies on abuse monitoring still apply.",
+  },
+  {
+    what: "Voice conversations",
+    stored:
+      "Handled by our voice provider, Retell AI, which processes your audio to hold the conversation. Depending on how the voice agent is configured, Retell may keep recordings or transcripts. We'll state the exact setting here before public launch.",
+  },
+  {
+    what: "Memory",
+    stored:
+      "Off by default. If you turn it on, only notes you write and save are stored, and they're used to personalise replies. You can view, delete, or export them at any time.",
+  },
+];
+
+export default function PrivacyPage() {
+  return (
+    <>
+      <SiteHeader>
+        <Link href="/talk" className="text-sm text-sand hover:text-cream">
+          Open app
+        </Link>
+      </SiteHeader>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:px-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-brass">Plain language</p>
+        <h1 className="mt-3 font-serif text-4xl text-cream">What happens to what you share</h1>
+        <p className="mt-4 text-lg leading-relaxed text-sand">
+          Talking about your life takes trust. Here&apos;s exactly what is and isn&apos;t kept.
+          We don&apos;t call the app &ldquo;completely confidential&rdquo;, because your messages
+          do pass through the AI and voice providers listed below.
+        </p>
+
+        <dl className="mt-10 divide-y divide-line rounded-2xl border border-line bg-ink-2">
+          {ROWS.map((r) => (
+            <div key={r.what} className="grid gap-2 p-5 sm:grid-cols-[180px_1fr] sm:gap-6">
+              <dt className="font-medium text-cream">{r.what}</dt>
+              <dd className="leading-relaxed text-sand">{r.stored}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <h2 className="mt-12 font-serif text-2xl text-cream">Your controls</h2>
+        <ul className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-sand">
+          <li>Turn memory on or off, and delete any memory, in Settings.</li>
+          <li>Download everything we store about you as a file.</li>
+          <li>Delete your account, which permanently removes your profile and memories.</li>
+        </ul>
+
+        <h2 className="mt-12 font-serif text-2xl text-cream">How it&apos;s protected</h2>
+        <ul className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-sand">
+          <li>All traffic is encrypted in transit (HTTPS).</li>
+          <li>Database rules ensure each account can only ever read its own data.</li>
+          <li>Keys for the AI and voice services stay on our server, never in your browser.</li>
+        </ul>
+
+        <p className="mt-12 rounded-xl border border-line p-4 text-sm text-dust">
+          This is an early version. A full privacy policy and terms, reviewed by a qualified
+          professional, will be published before public launch.
+        </p>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
