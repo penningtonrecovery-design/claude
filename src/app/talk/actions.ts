@@ -46,3 +46,15 @@ export async function completeOnboarding(
   revalidatePath("/talk");
   return undefined;
 }
+
+// Records that he answered or dismissed a check-in, which starts the next interval.
+export async function markCheckinSeen(key: string): Promise<void> {
+  const parsed = z.string().max(40).safeParse(key);
+  if (!parsed.success) return;
+  const { supabase, user } = await getCurrentUser();
+  if (!supabase || !user) return;
+  await supabase
+    .from("profiles")
+    .update({ last_checkin_at: new Date().toISOString(), last_checkin_key: parsed.data })
+    .eq("id", user.id);
+}

@@ -7,7 +7,7 @@ at a time, offers practical wisdom, and is honest that he's an AI and not a ther
 This repository holds the **Phase 1 foundation** (landing page, sign-in, onboarding, a
 private conversation screen with voice and text, consent-based memory notes, data export and
 deletion, essential safety handling) and the **Phase 2 core loop** (growth plans, progress
-tracking, monthly reflections).
+tracking, monthly reflections, in-app check-ins).
 
 > **Not ready for the public.** The psychological guidance, safety wording and crisis
 > resources need qualified professional review first. See
@@ -27,6 +27,7 @@ tracking, monthly reflections).
 | Growth plans: 10 topics, starter step library, edit/add/remove steps, progress and notes | Working |
 | AI-tailored plan steps | Built and unit-tested; **not yet verified against the live OpenAI API** |
 | Monthly reflections (1–5 per area, optional words, history, in-app reminder with snooze) | Working |
+| Check-ins (opt-in, in-app only, pre-written notes; weekly / two-weekly / monthly) | Working |
 | Row-level security (each user sees only their own data) | Tested against Postgres |
 
 Without keys, the app says plainly that voice or text isn't configured, rather than
@@ -93,6 +94,7 @@ src/lib/
   ai/                    language-model provider interface + OpenAI
   chat/                  request validation, safety-first response pipeline
   growth/                step library, AI tailoring, reflection schedule and schemas
+  checkins.ts            check-in note library and schedule
   supabase/              server, browser and proxy clients
 src/proxy.ts             session refresh + private-page guard (Next 16's "middleware")
 supabase/migrations/     database schema and row-level security

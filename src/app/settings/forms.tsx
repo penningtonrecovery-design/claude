@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 import { inputClass, Notice } from "@/components/auth-shell";
-import { addMemory, deleteAccount, updateDisplayName } from "./actions";
+import { CHECKIN_FREQUENCIES, FREQUENCY_LABELS, type CheckinFrequency } from "@/lib/checkins";
+import { addMemory, deleteAccount, setCheckinFrequency, updateDisplayName } from "./actions";
 
 const smallButton =
   "rounded-full bg-brass px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-brass-bright disabled:opacity-60";
@@ -66,6 +67,31 @@ export function DeleteAccountForm() {
       <button type="submit" disabled={pending} className="rounded-full border border-ember/70 px-5 py-2.5 text-sm text-alert transition hover:bg-alert-bg disabled:opacity-60">
         {pending ? "Deleting…" : "Delete my account"}
       </button>
+    </form>
+  );
+}
+
+export function CheckinForm({ current }: { current: CheckinFrequency }) {
+  const [state, action, pending] = useActionState(setCheckinFrequency, undefined);
+  return (
+    <form action={action} className="space-y-3">
+      <fieldset className="grid gap-2 sm:grid-cols-2">
+        <legend className="sr-only">How often</legend>
+        {CHECKIN_FREQUENCIES.map((f) => (
+          <label
+            key={f}
+            className="flex cursor-pointer items-center gap-3 rounded-xl border border-line px-4 py-3 has-[:checked]:border-brass has-[:checked]:bg-ink-3"
+          >
+            <input type="radio" name="frequency" value={f} defaultChecked={f === current} className="accent-[#c99a5b]" />
+            <span className="text-cream">{FREQUENCY_LABELS[f]}</span>
+          </label>
+        ))}
+      </fieldset>
+      <div className="flex items-center gap-3">
+        <button type="submit" disabled={pending} className={smallButton}>Save</button>
+        {state?.ok && <span className="text-sm text-moss">{state.ok}</span>}
+      </div>
+      {state?.error && <Notice tone="error">{state.error}</Notice>}
     </form>
   );
 }

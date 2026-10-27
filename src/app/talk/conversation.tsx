@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import type { CheckinNote } from "@/lib/checkins";
 import type { SafetyLevel } from "@/lib/safety/classifier";
+import { markCheckinSeen } from "./actions";
 import { TextChat } from "./text-chat";
 import { VoicePanel } from "./voice-panel";
 
@@ -12,14 +14,30 @@ export function Conversation({
   voiceConfigured,
   aiConfigured,
   resources,
+  checkin,
 }: {
   displayName: string | null;
   voiceConfigured: boolean;
   aiConfigured: boolean;
   resources: React.ReactNode;
+  checkin: CheckinNote | null;
 }) {
   const [mode, setMode] = useState<Mode>(voiceConfigured || !aiConfigured ? "voice" : "text");
   const [safety, setSafety] = useState<SafetyLevel>("none");
+  const [note, setNote] = useState<CheckinNote | null>(checkin);
+  const [opening, setOpening] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+
+  function closeCheckin(reply: boolean) {
+    if (!note) return;
+    const current = note;
+    setNote(null);
+    if (reply) {
+      setOpening(current.text);
+      setMode("text");
+    }
+    startTransition(() => markCheckinSeen(current.key));
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
@@ -45,6 +63,20 @@ export function Conversation({
         </div>
       </div>
 
+      {note && (
+        <section aria-label="Check-in" className="mx-4 mt-6 rounded-2xl border border-brass/40 bg-ink-2 p-5 sm:mx-6">
+          <p className="font-serif text-xl leading-relaxed text-cream">{note.text}</p>
+          <div className="mt-4 flex items-center gap-4">
+            <button type="button" onClick={() => closeCheckin(true)} className="rounded-full bg-brass px-5 py-2 text-sm font-medium text-ink transition hover:bg-brass-bright">
+              Reply
+            </button>
+            <button type="button" onClick={() => closeCheckin(false)} className="text-sm text-dust hover:text-cream">
+              Thanks
+            </button>
+          </div>
+        </section>
+      )}
+
       {safety !== "none" && (
         <section aria-label="Support resources" className="mx-4 mt-6 rounded-2xl border border-ember/50 bg-ink-2 p-5 sm:mx-6">
           <h2 className="font-serif text-xl text-cream">
@@ -63,6 +95,7 @@ export function Conversation({
       </div>
       <div hidden={mode !== "text"} className="flex-1">
         <TextChat
+          opening={opening}
           configured={aiConfigured}
           displayName={displayName}
           onSafety={(level) =>

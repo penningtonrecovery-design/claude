@@ -74,6 +74,9 @@ do $$ begin
   if (select reflection_prompts_enabled from public.profiles where id = '33333333-3333-3333-3333-333333333333') is not true then
     raise exception 'FAIL: reflection prompts should default on';
   end if;
+  if (select checkin_frequency from public.profiles where id = '33333333-3333-3333-3333-333333333333') <> 'off' then
+    raise exception 'FAIL: check-ins must default to off';
+  end if;
 end $$;
 
 -- Account deletion removes plans, steps and reflections.

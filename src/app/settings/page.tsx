@@ -5,7 +5,8 @@ import { AppHeader, PageLoading } from "@/components/app-header";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { setReflectionPrompts } from "@/app/reflect/actions";
 import { deleteAllMemories, deleteMemory, setMemoryEnabled } from "./actions";
-import { AddMemoryForm, DeleteAccountForm, DisplayNameForm } from "./forms";
+import { isCheckinFrequency } from "@/lib/checkins";
+import { AddMemoryForm, CheckinForm, DeleteAccountForm, DisplayNameForm } from "./forms";
 
 export const metadata: Metadata = { title: "Settings · Fatherly Friend" };
 
@@ -46,7 +47,7 @@ async function SettingsContent() {
   if (!supabase || !user) redirect("/login?next=/settings");
 
   const [{ data: profile }, { data: memories }] = await Promise.all([
-    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency").eq("id", user.id).maybeSingle(),
     supabase.from("memories").select("id, category, content, created_at").order("created_at", { ascending: false }),
   ]);
   const memoryOn = Boolean(profile?.memory_enabled);
@@ -110,6 +111,13 @@ async function SettingsContent() {
             </form>
           </div>
         )}
+      </Card>
+
+      <Card
+        title="Check-ins"
+        intro="A short note from Fatherly Friend when you open the app, if you'd like one. Only ever inside the app: no emails, no notifications. Off by default."
+      >
+        <CheckinForm current={isCheckinFrequency(profile?.checkin_frequency) ? profile.checkin_frequency : "off"} />
       </Card>
 
       <Card

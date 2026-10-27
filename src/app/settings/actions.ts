@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { isCheckinFrequency } from "@/lib/checkins";
 import { createAdminClient, getCurrentUser } from "@/lib/supabase/server";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
@@ -80,9 +81,32 @@ export async function deleteAccount(_prev: ActionState, formData: FormData): Pro
   if (!admin) {
     return { error: "Account deletion isn't configured on this server yet (missing SUPABASE_SECRET_KEY)." };
   }
-  // Profile and memories are removed by ON DELETE CASCADE.
+  // Profile, memories, plans and reflections are removed by ON DELETE CASCADE.
   const { error } = await admin.auth.admin.deleteUser(user.id);
   if (error) return { error: "We couldn't delete your account. Please try again." };
   await supabase.auth.signOut();
   redirect("/?deleted=1");
+}
+
+export async function setCheckinFrequency(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const frequency = formData.get("frequency");
+  if (!isCheckinFrequency(frequency)) return { error: "Choose one of the options." };
+  const { supabase, user } = await requireUser();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("checkin_frequency")
+    .eq("id", user.id)
+    .maybeSingle();
+  // Turning check-ins on (from off) starts the clock; changing frequency keeps it.
+  const turningOn = frequency !== "off" && profile?.checkin_frequency === "off";
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      checkin_frequency: frequency,
+      ...(turningOn ? { checkin_enabled_at: new Date().toISOString(), last_checkin_at: null } : {}),
+    })
+    .eq("id", user.id);
+  if (error) return { error: "Couldn't save. Please try again." };
+  revalidatePath("/settings");
+  return { ok: frequency === "off" ? "Check-ins are off." : "Saved." };
 }

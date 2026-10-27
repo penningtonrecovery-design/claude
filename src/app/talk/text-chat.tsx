@@ -8,10 +8,12 @@ type Message = { role: "user" | "assistant"; content: string };
 const RANK: Record<SafetyLevel, number> = { none: 0, distress: 1, abuse: 2, crisis: 3 };
 
 export function TextChat({
+  opening,
   configured,
   displayName,
   onSafety,
 }: {
+  opening?: string | null;
   configured: boolean;
   displayName: string | null;
   onSafety: (level: SafetyLevel) => void;
@@ -22,6 +24,17 @@ export function TextChat({
       content: `${displayName ? `Hello, ${displayName}.` : "Hello there."} I'm glad you're here. There's no rush. What's on your mind today?`,
     },
   ]);
+  // A check-in he chose to reply to joins the conversation as his next prompt,
+  // keeping anything already said.
+  const [shownOpening, setShownOpening] = useState<string | null>(null);
+  if (opening && opening !== shownOpening) {
+    setShownOpening(opening);
+    setMessages((m) =>
+      m.length === 1 && m[0].role === "assistant"
+        ? [{ role: "assistant", content: opening }]
+        : [...m, { role: "assistant", content: opening }],
+    );
+  }
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
   const [notice, setNotice] = useState<string | null>(

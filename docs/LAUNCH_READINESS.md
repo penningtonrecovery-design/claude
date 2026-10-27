@@ -10,7 +10,7 @@ every **Blocker** is resolved.
       and the distress/abuse instructions.
 - [ ] Clinician review of the growth-plan step library (`src/lib/growth/library.ts`), the
       tailoring instructions (`src/lib/growth/tailor.ts`) and the reflection questions and
-      scale labels (`src/lib/growth/reflection.ts`).
+      scale labels (`src/lib/growth/reflection.ts`), and the check-in notes (`src/lib/checkins.ts`).
 - [ ] Re-verify every crisis resource (numbers, hours, wording) in `src/lib/safety/resources.ts`.
 - [ ] Evaluate the safety classifier on a reviewed test set, including indirect language,
       slang, sarcasm and past-tense disclosures. Measure misses and over-triggers.

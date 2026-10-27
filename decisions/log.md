@@ -69,3 +69,8 @@
 **Decision:** With memory on, active plans and their unfinished steps are added to the conversation prompt. Reflection scores and notes are never sent to the language model.
 **Reasoning:** Consistent with the memory consent model: memory-off means nothing carries into conversations. Scores are sensitive and add little to a conversation.
 **Context:** Default stated to the user at the start of Phase 2.
+
+## 2026-10-27 — Check-ins are in-app only, from a written library
+**Decision:** Check-ins are opt-in (off by default) notes on the Talk page, at a frequency he picks (weekly, every two weeks, monthly). Text comes from a fixed, reviewable library; with memory on, some notes name one of his open plan steps. Nothing is sent by email or push. A note stays until he taps Thanks or Reply; Reply opens text chat with the note as the opening line. When a monthly reflection is due, the check-in waits.
+**Reasoning:** User chose in-app delivery and a written library. Fixed wording lets a professional review every message and lets tests enforce the no-guilt, no-dependency rules (no "we miss you", no streaks, no "you haven't"). Showing one prompt at a time avoids nagging.
+**Context:** Phase 2, second pass. The first check-in comes one full interval after he turns them on.

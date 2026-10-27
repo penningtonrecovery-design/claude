@@ -78,12 +78,21 @@ onboarding or the last reflection; "Not now" snoozes 7 days; Settings turns remi
 The reminder is an in-app banner on `/talk` and `/plans` only. Reflections are never sent
 to the model.
 
+### Check-ins (Phase 2)
+Opt-in from Settings (off, weekly, every two weeks, monthly). `isCheckinDue` waits one full
+interval after he turns them on, then one interval after he last answered or dismissed one.
+The Talk page shows a note from the fixed library in `src/lib/checkins.ts`. With memory on,
+some notes name one of his open plan steps. A due monthly reflection takes precedence, so
+only one prompt shows at a time. **Reply** adds the note to the text chat as Fatherly
+Friend's next message; **Thanks** dismisses it. Both record `last_checkin_at`. Nothing is
+sent outside the app, and no AI writes the notes.
+
 ## Data model
 
 | Table | Purpose | Access |
 | --- | --- | --- |
 | `auth.users` | Supabase accounts | Supabase Auth |
-| `profiles` | name, memory consent, onboarding confirmations | user reads/updates own row; created by trigger; cascades on account deletion |
+| `profiles` | name, memory consent, onboarding confirmations, reflection and check-in preferences | user reads/updates own row; created by trigger; cascades on account deletion |
 | `memories` | user-written notes (category + ≤500 chars) | user CRUD on own rows only |
 | `growth_plans` | topic, focus, status | user CRUD on own rows |
 | `plan_steps` | step text, source (library/ai/user), done, note | user CRUD on own rows; insert/update also require the parent plan to be the user's |
@@ -104,8 +113,7 @@ reports missing services instead of throwing, so the UI can say "not configured"
   `createClient()` calls `connection()` so session reads are never prerendered.
 
 ## Planned (later phases)
-- Phase 2, second pass: user-controlled check-ins (needs an email or push provider),
-  advanced memory (suggested memories from conversations, approved by him).
+- Phase 2, remaining: advanced memory (suggested memories from conversations, approved by him).
 - Phase 3: avatar choice, personal photo option (secure storage, no impersonation),
   expanded reviewed knowledge base, further safety evaluation.
 - Voice safety parity: route voice turns through the same safety pipeline (Retell custom
