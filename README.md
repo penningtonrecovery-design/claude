@@ -36,6 +36,9 @@ faking replies. Crisis messages still get the fixed crisis response even with no
 
 ## Run it locally
 
+For a step-by-step walkthrough with a checklist of what to try, see
+[docs/TESTING_ON_YOUR_COMPUTER.md](docs/TESTING_ON_YOUR_COMPUTER.md).
+
 You need **Node.js 20.9+** and **Docker Desktop** (for the local Supabase stack).
 
 ```bash
