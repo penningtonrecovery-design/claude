@@ -59,7 +59,7 @@ export function DeleteAccountForm() {
   return (
     <form action={action} className="space-y-3">
       <label className="block">
-        <span className="mb-1.5 block text-sm text-sand">Type DELETE to permanently remove your account, profile and memories.</span>
+        <span className="mb-1.5 block text-sm text-sand">Type DELETE to permanently remove your account, profile, memories, plans and reflections.</span>
         <input name="confirm" autoComplete="off" className={inputClass} />
       </label>
       {state?.error && <Notice tone="error">{state.error}</Notice>}

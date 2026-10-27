@@ -21,6 +21,7 @@ export type RespondDeps = {
   moderate?: (text: string) => Promise<SafetyResult | null>;
   displayName?: string | null;
   memories?: { category: string; content: string }[];
+  plans?: { topic: string; focus: string | null; openSteps: string[] }[];
 };
 
 // Screens the latest message, then either returns a fixed crisis response or
@@ -54,6 +55,7 @@ export async function respond(
   const system = buildSystemPrompt({
     displayName: deps.displayName,
     memories: deps.memories,
+    plans: deps.plans,
     safetyInstructions: safetyInstructions(safety.level),
   });
 

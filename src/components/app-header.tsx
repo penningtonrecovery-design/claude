@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-chrome";
 
-export function AppHeader({ current }: { current: "talk" | "settings" }) {
+export function AppHeader({ current }: { current: "talk" | "plans" | "reflect" | "settings" }) {
   const link = (href: string, label: string, active: boolean) => (
     <Link
       href={href}
@@ -13,7 +13,9 @@ export function AppHeader({ current }: { current: "talk" | "settings" }) {
   );
   return (
     <SiteHeader compactBrand>
-      {link("/talk", "Conversation", current === "talk")}
+      {link("/talk", "Talk", current === "talk")}
+      {link("/plans", "Plans", current === "plans")}
+      {link("/reflect", "Reflect", current === "reflect")}
       {link("/settings", "Settings", current === "settings")}
     </SiteHeader>
   );

@@ -104,3 +104,14 @@ export function mergeResults(a: SafetyResult, b: SafetyResult): SafetyResult {
     categories: [...new Set([...a.categories, ...b.categories])],
   };
 }
+
+// Screens text addressed to him ("you", "yourself"), such as AI-suggested
+// steps, by also reading it in the first person.
+export function classifySuggestion(text: string): SafetyResult {
+  const firstPerson = normalize(text)
+    .replace(/\byourself\b/g, "myself")
+    .replace(/\byou('re| are)\b/g, "i'm")
+    .replace(/\byour\b/g, "my")
+    .replace(/\byou\b/g, "i");
+  return mergeResults(classifyMessage(text), classifyMessage(firstPerson));
+}

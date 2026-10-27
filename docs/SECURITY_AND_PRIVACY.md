@@ -9,6 +9,8 @@ What this build does, what it relies on, and what it doesn't do yet.
 | Email, password hash, sessions | Supabase Auth | Password min. 10 chars; email confirmation on |
 | Name (optional), memory consent, onboarding confirmations | `public.profiles` | No conversation content |
 | Memory notes (opt-in) | `public.memories` | Only what the user writes; deletable individually or all at once |
+| Growth plans, steps, step notes | `public.growth_plans`, `public.plan_steps` | Open steps reach the model only with memory on; focus text is sent to OpenAI only when he asks for tailoring |
+| Monthly reflections | `public.reflections` | Never sent to the model; can't be edited, only deleted |
 | Text conversation | **Not stored by the app** | Lives in the browser tab only. Sent to OpenAI per message |
 | Voice audio and transcripts | Retell AI | Depends on the agent's data-storage setting. **Must be configured and documented before launch** |
 | Server logs | Vercel | Routes log only status codes and generic errors, never message content |
@@ -44,7 +46,7 @@ What this build does, what it relies on, and what it doesn't do yet.
 
 ## Not done yet (tracked in LAUNCH_READINESS.md)
 
-- Rate limiting on `/api/chat` and `/api/voice/web-call` (cost and abuse control).
+- Rate limiting on `/api/chat`, `/api/plans/tailor` and `/api/voice/web-call` (cost and abuse control).
 - Application-level encryption for memory notes.
 - Security headers / Content-Security-Policy review.
 - Retell data-storage configuration and privacy-page wording for voice.

@@ -59,6 +59,25 @@ Opt-in. Only notes the user writes in Settings are stored (`memories` table), an
 added to the prompt only while `memory_enabled` is true. Automatic memory extraction from
 conversations is deferred to Phase 2; it needs consent UX, review and safeguards.
 
+### Growth plans (Phase 2)
+1. `/plans/new`: he picks one of 10 topics (`src/lib/growth/library.ts`), optionally writes
+   his focus, and ticks or edits 1–5 steps. Library steps are fixed, reviewable text.
+2. Optional tailoring: `/api/plans/tailor` screens his focus (keywords + moderation; a
+   crisis-level focus returns crisis resources, no model call), asks the model for JSON
+   steps, validates shape and length, and drops any step that fails `classifySuggestion`
+   (the safety screen read in both second and first person). Nothing is saved here.
+3. `createPlan` saves the plan and steps. On `/plans` he ticks steps (optimistic UI), adds
+   notes, edits or removes steps, adds his own (max 5), completes, sets aside or deletes a plan.
+4. With memory on, `/api/chat` adds up to 3 active plans' open steps to the prompt with a
+   "never pressure him" instruction.
+
+### Monthly reflection (Phase 2)
+`/reflect`: five areas rated 1–5 or skipped, optional note each, and "proud of". History
+table shows the trend, oldest to newest. `isReflectionDue` offers one 30 days after
+onboarding or the last reflection; "Not now" snoozes 7 days; Settings turns reminders off.
+The reminder is an in-app banner on `/talk` and `/plans` only. Reflections are never sent
+to the model.
+
 ## Data model
 
 | Table | Purpose | Access |
@@ -66,6 +85,9 @@ conversations is deferred to Phase 2; it needs consent UX, review and safeguards
 | `auth.users` | Supabase accounts | Supabase Auth |
 | `profiles` | name, memory consent, onboarding confirmations | user reads/updates own row; created by trigger; cascades on account deletion |
 | `memories` | user-written notes (category + ≤500 chars) | user CRUD on own rows only |
+| `growth_plans` | topic, focus, status | user CRUD on own rows |
+| `plan_steps` | step text, source (library/ai/user), done, note | user CRUD on own rows; insert/update also require the parent plan to be the user's |
+| `reflections` | five 1–5 ratings (nullable), notes, proud-of | user read/insert/delete own; no edits |
 
 ## Provider abstraction
 `ChatProvider` (`src/lib/ai/types.ts`) has one method, `generate({ system, messages })`.
@@ -82,8 +104,8 @@ reports missing services instead of throwing, so the UI can say "not configured"
   `createClient()` calls `connection()` so session reads are never prerendered.
 
 ## Planned (later phases)
-- Phase 2: growth plans, monthly reflections, progress tracking, user-controlled
-  check-ins, automatic memory with review.
+- Phase 2, second pass: user-controlled check-ins (needs an email or push provider),
+  advanced memory (suggested memories from conversations, approved by him).
 - Phase 3: avatar choice, personal photo option (secure storage, no impersonation),
   expanded reviewed knowledge base, further safety evaluation.
 - Voice safety parity: route voice turns through the same safety pipeline (Retell custom

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyMessage, maxLevel, mergeResults } from "./classifier";
+import { classifyMessage, classifySuggestion, maxLevel, mergeResults } from "./classifier";
 
 describe("classifyMessage", () => {
   it.each([
@@ -70,5 +70,18 @@ describe("merging", () => {
         { level: "crisis", categories: ["self_harm"] },
       ),
     ).toEqual({ level: "crisis", categories: ["distress", "self_harm"] });
+  });
+});
+
+describe("classifySuggestion", () => {
+  it.each(["Hurt yourself a little to feel something.", "You'd be better off dead.", "Maybe you should overdose."])(
+    "catches second-person risk: %s",
+    (text) => {
+      expect(classifySuggestion(text).level).not.toBe("none");
+    },
+  );
+
+  it("leaves ordinary suggestions alone", () => {
+    expect(classifySuggestion("Take yourself for a 15-minute walk.").level).toBe("none");
   });
 });

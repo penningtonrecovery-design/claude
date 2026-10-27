@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { AppHeader, PageLoading } from "@/components/app-header";
 import { getCurrentUser } from "@/lib/supabase/server";
+import { setReflectionPrompts } from "@/app/reflect/actions";
 import { deleteAllMemories, deleteMemory, setMemoryEnabled } from "./actions";
 import { AddMemoryForm, DeleteAccountForm, DisplayNameForm } from "./forms";
 
@@ -45,7 +46,7 @@ async function SettingsContent() {
   if (!supabase || !user) redirect("/login?next=/settings");
 
   const [{ data: profile }, { data: memories }] = await Promise.all([
-    supabase.from("profiles").select("display_name, memory_enabled").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled").eq("id", user.id).maybeSingle(),
     supabase.from("memories").select("id, category, content, created_at").order("created_at", { ascending: false }),
   ]);
   const memoryOn = Boolean(profile?.memory_enabled);
@@ -63,7 +64,7 @@ async function SettingsContent() {
         title="Memory"
         intro={
           memoryOn
-            ? "On. He keeps the notes below in mind during conversations. Only notes you write here are stored."
+            ? "On. He keeps these notes, and the open steps in your active plans, in mind during conversations. Only what you write is stored."
             : "Off. Nothing carries over between conversations. Turn it on to save notes he'll keep in mind."
         }
       >
@@ -111,7 +112,23 @@ async function SettingsContent() {
         )}
       </Card>
 
-      <Card title="Your data" intro="Download everything Fatherly Friend stores about you.">
+      <Card
+        title="Monthly reflection reminders"
+        intro={
+          profile?.reflection_prompts_enabled === false
+            ? "Off. You can still reflect any time from the Reflect page."
+            : "On. About once a month, a quiet note in the app offers a reflection. Nothing is ever sent to you outside the app."
+        }
+      >
+        <form action={setReflectionPrompts}>
+          <input type="hidden" name="enabled" value={profile?.reflection_prompts_enabled === false ? "true" : "false"} />
+          <button type="submit" className="rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
+            {profile?.reflection_prompts_enabled === false ? "Turn reminders on" : "Turn reminders off"}
+          </button>
+        </form>
+      </Card>
+
+      <Card title="Your data" intro="Download everything Fatherly Friend stores about you: profile, memory notes, plans and reflections.">
         <a href="/api/account/export" className="inline-block rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
           Download my data
         </a>

@@ -26,6 +26,16 @@ const ROWS: { what: string; stored: string }[] = [
       "Handled by our voice provider, Retell AI, which processes your audio to hold the conversation. Depending on how the voice agent is configured, Retell may keep recordings or transcripts. We'll state the exact setting here before public launch.",
   },
   {
+    what: "Growth plans",
+    stored:
+      "The plans and steps you choose, whether you've marked them done, and any notes you add. If memory is on, open steps are shared with the AI so he can ask how they're going. If you ask him to tailor steps, what you wrote about your focus is sent to OpenAI for that request.",
+  },
+  {
+    what: "Monthly reflections",
+    stored:
+      "Your 1–5 ratings and any words you add. These are never sent to the AI. Delete any reflection at any time.",
+  },
+  {
     what: "Memory",
     stored:
       "Off by default. If you turn it on, only notes you write and save are stored, and they're used to personalise replies. You can view, delete, or export them at any time.",
@@ -62,7 +72,8 @@ export default function PrivacyPage() {
         <ul className="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-sand">
           <li>Turn memory on or off, and delete any memory, in Settings.</li>
           <li>Download everything we store about you as a file.</li>
-          <li>Delete your account, which permanently removes your profile and memories.</li>
+          <li>Delete any plan, step, note or reflection on its own page.</li>
+          <li>Delete your account, which permanently removes your profile, memories, plans and reflections.</li>
         </ul>
 
         <h2 className="mt-12 font-serif text-2xl text-cream">How it&apos;s protected</h2>

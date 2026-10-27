@@ -8,9 +8,11 @@ export async function GET() {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const [{ data: profile }, { data: memories }] = await Promise.all([
+  const [{ data: profile }, { data: memories }, { data: plans }, { data: reflections }] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
     supabase.from("memories").select("*").order("created_at", { ascending: true }),
+    supabase.from("growth_plans").select("*, plan_steps (*)").order("created_at", { ascending: true }),
+    supabase.from("reflections").select("*").order("created_at", { ascending: true }),
   ]);
 
   const body = {
@@ -18,6 +20,8 @@ export async function GET() {
     account: { id: user.id, email: user.email, created_at: user.created_at },
     profile,
     memories: memories ?? [],
+    growth_plans: plans ?? [],
+    reflections: reflections ?? [],
     note: "Text conversations are not stored by Fatherly Friend. Voice calls are handled by Retell AI; see the privacy page.",
   };
 

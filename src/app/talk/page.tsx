@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AppHeader, PageLoading } from "@/components/app-header";
 import { CrisisResources } from "@/components/crisis-resources";
+import { ReflectionBanner } from "@/components/reflection-banner";
 import { getAiConfig, getVoiceConfig } from "@/lib/config";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { Conversation } from "./conversation";
@@ -36,11 +37,18 @@ async function TalkContent() {
   if (!profile?.onboarding_completed_at) return <Onboarding />;
 
   return (
-    <Conversation
-      displayName={profile.display_name}
-      voiceConfigured={getVoiceConfig() !== null}
-      aiConfigured={getAiConfig() !== null}
-      resources={<CrisisResources compact />}
-    />
+    <>
+      <div className="px-4 sm:px-6">
+        <Suspense fallback={null}>
+          <ReflectionBanner />
+        </Suspense>
+      </div>
+      <Conversation
+        displayName={profile.display_name}
+        voiceConfigured={getVoiceConfig() !== null}
+        aiConfigured={getAiConfig() !== null}
+        resources={<CrisisResources compact />}
+      />
+    </>
   );
 }

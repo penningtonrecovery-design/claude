@@ -49,3 +49,23 @@
 **Decision:** Every user text message is screened by a deterministic keyword classifier and, when OpenAI is configured, the moderation endpoint. Crisis-level messages get a fixed, reviewed response with US resources and never go to the language model. Distress-level messages go to the model with extra safety instructions and a resource banner.
 **Reasoning:** Crisis handling must not depend on a generative model behaving well. Keyword lists miss things, so moderation adds a second signal; either signal escalates.
 **Context:** Voice calls run inside Retell, so this screening does not see voice in real time — documented as a known gap.
+
+## 2026-10-27 — Phase 2 starts with the core loop
+**Decision:** Build growth plans, progress tracking and monthly reflections first. Advanced memory and check-ins follow in a second pass.
+**Reasoning:** These three form a usable loop (choose a focus → act → reflect) without new external services. Check-ins need an email or push provider, and memory from conversations raises consent questions, both of which need separate decisions.
+**Context:** User chose "core loop" when Phase 2 began.
+
+## 2026-10-27 — Plan steps: reviewed library plus optional AI tailoring
+**Decision:** Each of the 10 topics has a written library of small steps. A man picks a topic, optionally describes his focus, and chooses or edits 3–5 steps. If OpenAI is configured he can ask for steps tailored to his focus; tailored steps are validated (length, count, JSON shape) and each is run through the safety classifier, and anything flagged is dropped. His focus text is safety-screened first, and a crisis-level focus gets crisis resources instead of a plan.
+**Reasoning:** The library works without keys and is fixed text a professional can review. AI tailoring adds personalisation; the man edits or declines everything.
+**Context:** User chose "library plus AI".
+
+## 2026-10-27 — Monthly reflection: 1–5 self-rating per area, optional words
+**Decision:** Five areas (confidence, emotional well-being, relationships, identity, personal responsibility), each rated 1–5 or skipped, with an optional note each and one "proud of" question. Offered in-app 30 days after onboarding or the last reflection; "Not now" snoozes for 7 days; can be turned off in Settings. Never sent by email or push. Always labelled self-reported, not clinical.
+**Reasoning:** Quick to complete and makes his own trend visible. Snooze and off switch avoid nagging or guilt.
+**Context:** User chose the 1–5 scale.
+
+## 2026-10-27 — Plans are visible to conversations only when memory is on
+**Decision:** With memory on, active plans and their unfinished steps are added to the conversation prompt. Reflection scores and notes are never sent to the language model.
+**Reasoning:** Consistent with the memory consent model: memory-off means nothing carries into conversations. Scores are sensitive and add little to a conversation.
+**Context:** Default stated to the user at the start of Phase 2.

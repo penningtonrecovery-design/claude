@@ -11,4 +11,6 @@ psql -v ON_ERROR_STOP=1 -q -d "$DB" -f supabase/tests/auth_shim.sql
 for f in supabase/migrations/*.sql; do
   psql -v ON_ERROR_STOP=1 -q -d "$DB" -f "$f"
 done
-psql -v ON_ERROR_STOP=1 -q -d "$DB" -f supabase/tests/rls_test.sql
+for f in supabase/tests/*_test.sql; do
+  psql -v ON_ERROR_STOP=1 -q -d "$DB" -f "$f"
+done

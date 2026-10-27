@@ -8,6 +8,9 @@ every **Blocker** is resolved.
 - [ ] Qualified clinician review of the persona prompt (`src/lib/persona/system-prompt.ts`).
 - [ ] Clinician review of the fixed crisis and harm-to-others responses (`src/lib/safety/responses.ts`)
       and the distress/abuse instructions.
+- [ ] Clinician review of the growth-plan step library (`src/lib/growth/library.ts`), the
+      tailoring instructions (`src/lib/growth/tailor.ts`) and the reflection questions and
+      scale labels (`src/lib/growth/reflection.ts`).
 - [ ] Re-verify every crisis resource (numbers, hours, wording) in `src/lib/safety/resources.ts`.
 - [ ] Evaluate the safety classifier on a reviewed test set, including indirect language,
       slang, sarcasm and past-tense disclosures. Measure misses and over-triggers.
@@ -43,6 +46,7 @@ every **Blocker** is resolved.
 
 ## Product verification
 
+- [ ] Plan tailoring tested live: output quality, refusals, and that unsafe suggestions are dropped.
 - [ ] Text conversation tested live with your OpenAI key and chosen model.
 - [ ] Voice tested live with your Retell agent: latency, interruption, pause, end, voice choice.
 - [ ] Magic link, password sign-up, confirmation and reset tested end to end against

@@ -43,6 +43,7 @@ Begin warmly and simply. Let him lead.`;
 export type PromptContext = {
   displayName?: string | null;
   memories?: { category: string; content: string }[];
+  plans?: { topic: string; focus: string | null; openSteps: string[] }[];
   safetyInstructions?: string | null;
 };
 
@@ -59,6 +60,21 @@ export function buildSystemPrompt(context: PromptContext = {}): string {
       [
         "THINGS HE HAS ASKED YOU TO REMEMBER",
         "He wrote these himself and chose to share them. Use them naturally and sparingly; do not recite them back.",
+        ...lines,
+      ].join("\n"),
+    );
+  }
+
+  if (context.plans && context.plans.length > 0) {
+    const lines = context.plans.map((p) => {
+      const heading = p.focus ? `${p.topic}: ${p.focus}` : p.topic;
+      const steps = p.openSteps.map((s) => `  - ${s}`);
+      return [`- ${heading}`, ...steps].join("\n");
+    });
+    parts.push(
+      [
+        "HIS ACTIVE GROWTH PLANS",
+        "He chose these steps himself. You may gently ask how one is going when it fits. Never pressure him or make him feel behind.",
         ...lines,
       ].join("\n"),
     );

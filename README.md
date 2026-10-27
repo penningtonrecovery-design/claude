@@ -4,9 +4,10 @@ A voice-first AI companion for adult men who grew up without the fatherly guidan
 needed. He speaks like a warm, steady grandfather: he listens first, asks one question
 at a time, offers practical wisdom, and is honest that he's an AI and not a therapist.
 
-This repository is the **Phase 1 foundation**: landing page, sign-in, onboarding, a
-private conversation screen (voice and text), consent-based memory notes, data export and
-deletion, and essential safety handling.
+This repository holds the **Phase 1 foundation** (landing page, sign-in, onboarding, a
+private conversation screen with voice and text, consent-based memory notes, data export and
+deletion, essential safety handling) and the **Phase 2 core loop** (growth plans, progress
+tracking, monthly reflections).
 
 > **Not ready for the public.** The psychological guidance, safety wording and crisis
 > resources need qualified professional review first. See
@@ -23,6 +24,9 @@ deletion, and essential safety handling.
 | Voice conversation via Retell | Built and unit-tested; **not yet verified against a live Retell agent** |
 | Safety screening and fixed crisis response | Working; tested end to end in the browser |
 | Memory notes (opt-in), export, account deletion | Working |
+| Growth plans: 10 topics, starter step library, edit/add/remove steps, progress and notes | Working |
+| AI-tailored plan steps | Built and unit-tested; **not yet verified against the live OpenAI API** |
+| Monthly reflections (1–5 per area, optional words, history, in-app reminder with snooze) | Working |
 | Row-level security (each user sees only their own data) | Tested against Postgres |
 
 Without keys, the app says plainly that voice or text isn't configured, rather than
@@ -75,16 +79,20 @@ src/app/                 pages and API routes (Next.js App Router)
   page.tsx               landing
   login/, reset-password/, update-password/, auth/   sign-in flows
   talk/                  onboarding + conversation (voice and text)
-  settings/              name, memory notes, export, delete account
+  plans/                 growth plans: list, progress, notes; plans/new builder
+  reflect/               monthly reflection form and history
+  settings/              name, memory notes, reminders, export, delete account
   help/, privacy/        crisis resources, plain-language privacy
   api/chat/              text conversation endpoint
   api/voice/web-call/    Retell proxy (holds the API key)
+  api/plans/tailor/      AI-tailored plan step suggestions
   api/account/export/    data export
 src/lib/
   persona/               the Fatherly Friend prompt (shared by text and voice)
   safety/                risk classifier, moderation, crisis responses, resources
   ai/                    language-model provider interface + OpenAI
   chat/                  request validation, safety-first response pipeline
+  growth/                step library, AI tailoring, reflection schedule and schemas
   supabase/              server, browser and proxy clients
 src/proxy.ts             session refresh + private-page guard (Next 16's "middleware")
 supabase/migrations/     database schema and row-level security

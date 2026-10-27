@@ -11,14 +11,16 @@ insert into auth.users (id, email) values
 
 -- The trigger created one profile per user.
 do $$ begin
-  if (select count(*) from public.profiles) <> 2 then
+  if (select count(*) from public.profiles where id in
+      ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222')) <> 2 then
     raise exception 'FAIL: expected a profile per new user';
   end if;
 end $$;
 
 -- Memory consent defaults to off.
 do $$ begin
-  if exists (select 1 from public.profiles where memory_enabled) then
+  if exists (select 1 from public.profiles where memory_enabled and id in
+      ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222222')) then
     raise exception 'FAIL: memory must default to off';
   end if;
 end $$;
@@ -89,7 +91,7 @@ end $$;
 
 reset role;
 do $$ begin
-  if (select count(*) from public.memories) <> 1 then
+  if (select count(*) from public.memories where user_id = '11111111-1111-1111-1111-111111111111') <> 1 then
     raise exception 'FAIL: user B deleted user A''s memory';
   end if;
 end $$;
@@ -97,7 +99,7 @@ end $$;
 -- Deleting an auth user removes their data.
 delete from auth.users where id = '11111111-1111-1111-1111-111111111111';
 do $$ begin
-  if exists (select 1 from public.memories) or
+  if exists (select 1 from public.memories where user_id = '11111111-1111-1111-1111-111111111111') or
      exists (select 1 from public.profiles where id = '11111111-1111-1111-1111-111111111111') then
     raise exception 'FAIL: account deletion left personal data behind';
   end if;

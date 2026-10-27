@@ -26,4 +26,18 @@ describe("Fatherly Friend persona", () => {
   it("omits the memory section when memories are empty", () => {
     expect(buildSystemPrompt({ memories: [] })).not.toContain("ASKED YOU TO REMEMBER");
   });
+
+  it("adds active plan steps when given, with a no-pressure instruction", () => {
+    const prompt = buildSystemPrompt({
+      plans: [{ topic: "Boundaries", focus: "saying no at work", openSteps: ["Say no once this week."] }],
+    });
+    expect(prompt).toContain("HIS ACTIVE GROWTH PLANS");
+    expect(prompt).toContain("- Boundaries: saying no at work");
+    expect(prompt).toContain("  - Say no once this week.");
+    expect(prompt).toMatch(/Never pressure him/);
+  });
+
+  it("omits the plans section when there are no plans", () => {
+    expect(buildSystemPrompt({ plans: [] })).not.toContain("ACTIVE GROWTH PLANS");
+  });
 });
