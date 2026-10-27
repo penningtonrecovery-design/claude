@@ -13,12 +13,14 @@ export function Conversation({
   displayName,
   voiceConfigured,
   aiConfigured,
+  memoryEnabled,
   resources,
   checkin,
 }: {
   displayName: string | null;
   voiceConfigured: boolean;
   aiConfigured: boolean;
+  memoryEnabled: boolean;
   resources: React.ReactNode;
   checkin: CheckinNote | null;
 }) {
@@ -97,6 +99,7 @@ export function Conversation({
         <TextChat
           opening={opening}
           configured={aiConfigured}
+          memoryEnabled={memoryEnabled}
           displayName={displayName}
           onSafety={(level) =>
             setSafety((current) => (rank(level) > rank(current) ? level : current))

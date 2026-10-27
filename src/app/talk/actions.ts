@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { checkMemory } from "@/lib/memory/save";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 const onboardingSchema = z.object({
@@ -57,4 +58,37 @@ export async function markCheckinSeen(key: string): Promise<void> {
     .from("profiles")
     .update({ last_checkin_at: new Date().toISOString(), last_checkin_key: parsed.data })
     .eq("id", user.id);
+}
+
+export type RememberResult = { ok: true } | { ok: false; error: string; crisis?: boolean };
+
+// Saves one of his own chat messages (as he edited it) to memory.
+export async function rememberFromChat(category: string, content: string): Promise<RememberResult> {
+  const check = checkMemory({ category, content });
+  if (!check.ok) {
+    return check.reason === "crisis"
+      ? {
+          ok: false,
+          crisis: true,
+          error: "I won't save this one to memory. It sounds like a lot to carry, and you deserve real support with it right now.",
+        }
+      : { ok: false, error: "Keep it to a sentence or two (up to 500 characters) and pick a kind." };
+  }
+
+  const { supabase, user } = await getCurrentUser();
+  if (!supabase || !user) return { ok: false, error: "Your session has ended. Please sign in again." };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("memory_enabled")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (!profile?.memory_enabled) return { ok: false, error: "Memory is off. Turn it on in Settings to save things." };
+
+  const { error } = await supabase
+    .from("memories")
+    .insert({ category: check.category, content: check.content, source: "conversation" });
+  if (error) return { ok: false, error: "Couldn't save that. Please try again." };
+  revalidatePath("/settings");
+  return { ok: true };
 }

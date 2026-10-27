@@ -54,10 +54,13 @@ therapist or crisis service). Timestamps of those confirmations are stored on `p
 3. Retell returns short-lived call credentials; audio flows browser ↔ Retell over WebRTC.
 4. Pause = mute the mic, End = leave the call; interruption is handled by Retell.
 
-### Memory (Phase 1)
-Opt-in. Only notes the user writes in Settings are stored (`memories` table), and they're
-added to the prompt only while `memory_enabled` is true. Automatic memory extraction from
-conversations is deferred to Phase 2; it needs consent UX, review and safeguards.
+### Memory
+Opt-in. Two ways in, both chosen by him: notes he writes in Settings (`source = 'settings'`),
+and "Remember this" on his own text-chat messages (`source = 'conversation'`), which opens
+an editor prefilled with his words. Both go through `checkMemory` (`src/lib/memory/save.ts`):
+validation, plus crisis-level text is refused and he's pointed to help instead. Memories
+reach the prompt only while `memory_enabled` is true. There is no AI extraction. Voice isn't
+covered because the app receives no voice transcripts.
 
 ### Growth plans (Phase 2)
 1. `/plans/new`: he picks one of 10 topics (`src/lib/growth/library.ts`), optionally writes
@@ -113,7 +116,7 @@ reports missing services instead of throwing, so the UI can say "not configured"
   `createClient()` calls `connection()` so session reads are never prerendered.
 
 ## Planned (later phases)
-- Phase 2, remaining: advanced memory (suggested memories from conversations, approved by him).
+- Possible later opt-in: AI-suggested memories he approves.
 - Phase 3: avatar choice, personal photo option (secure storage, no impersonation),
   expanded reviewed knowledge base, further safety evaluation.
 - Voice safety parity: route voice turns through the same safety pipeline (Retell custom

@@ -43,7 +43,7 @@ const ROWS: { what: string; stored: string }[] = [
   {
     what: "Memory",
     stored:
-      "Off by default. If you turn it on, only notes you write and save are stored, and they're used to personalise replies. You can view, delete, or export them at any time.",
+      "Off by default. If you turn it on, only what you choose is stored: notes you write in Settings, and things you said in a text conversation that you tap \"Remember this\" on and save. They're used to personalise replies. You can view, delete, or export them at any time.",
   },
 ];
 

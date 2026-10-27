@@ -48,7 +48,7 @@ async function SettingsContent() {
 
   const [{ data: profile }, { data: memories }] = await Promise.all([
     supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency").eq("id", user.id).maybeSingle(),
-    supabase.from("memories").select("id, category, content, created_at").order("created_at", { ascending: false }),
+    supabase.from("memories").select("id, category, content, source, created_at").order("created_at", { ascending: false }),
   ]);
   const memoryOn = Boolean(profile?.memory_enabled);
 
@@ -95,6 +95,7 @@ async function SettingsContent() {
                 <li key={m.id} className="flex items-start justify-between gap-4 p-4">
                   <div>
                     <span className="text-xs uppercase tracking-wider text-brass">{CATEGORY_LABEL[m.category] ?? m.category}</span>
+                    {m.source === "conversation" && <span className="ml-2 text-xs text-dust">from a conversation</span>}
                     <p className="mt-1 leading-relaxed text-cream">{m.content}</p>
                   </div>
                   <form action={deleteMemory}>

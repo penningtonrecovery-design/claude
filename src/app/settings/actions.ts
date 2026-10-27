@@ -4,11 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { isCheckinFrequency } from "@/lib/checkins";
+import { checkMemory } from "@/lib/memory/save";
 import { createAdminClient, getCurrentUser } from "@/lib/supabase/server";
 
 export type ActionState = { error?: string; ok?: string } | undefined;
-
-const MEMORY_CATEGORIES = ["goal", "experience", "preference", "challenge", "achievement", "other"] as const;
 
 async function requireUser() {
   const { supabase, user } = await getCurrentUser();
@@ -37,13 +36,12 @@ export async function setMemoryEnabled(formData: FormData): Promise<void> {
 }
 
 export async function addMemory(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const parsed = z
-    .object({
-      category: z.enum(MEMORY_CATEGORIES),
-      content: z.string().trim().min(1).max(500),
-    })
-    .safeParse({ category: formData.get("category"), content: formData.get("content") });
-  if (!parsed.success) return { error: "Write a short note (up to 500 characters)." };
+  const check = checkMemory({ category: formData.get("category"), content: formData.get("content") });
+  if (!check.ok) {
+    return check.reason === "crisis"
+      ? { error: "This sounds like a lot to carry. Rather than save it, please reach out to someone now: call or text 988, or call 911 if you're in danger." }
+      : { error: "Write a short note (up to 500 characters)." };
+  }
 
   const { supabase, user } = await requireUser();
   const { data: profile } = await supabase
@@ -53,7 +51,9 @@ export async function addMemory(_prev: ActionState, formData: FormData): Promise
     .maybeSingle();
   if (!profile?.memory_enabled) return { error: "Turn memory on first." };
 
-  const { error } = await supabase.from("memories").insert(parsed.data);
+  const { error } = await supabase
+    .from("memories")
+    .insert({ category: check.category, content: check.content, source: "settings" });
   if (error) return { error: "Couldn't save that note. Please try again." };
   revalidatePath("/settings");
   return { ok: "Saved. He'll keep this in mind." };

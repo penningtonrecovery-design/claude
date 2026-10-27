@@ -53,6 +53,7 @@ async function TalkContent() {
         displayName={profile.display_name}
         voiceConfigured={getVoiceConfig() !== null}
         aiConfigured={getAiConfig() !== null}
+        memoryEnabled={Boolean(profile.memory_enabled)}
         resources={<CrisisResources compact />}
         checkin={checkin}
       />

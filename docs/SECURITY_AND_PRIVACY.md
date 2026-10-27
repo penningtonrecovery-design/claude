@@ -8,7 +8,7 @@ What this build does, what it relies on, and what it doesn't do yet.
 | --- | --- | --- |
 | Email, password hash, sessions | Supabase Auth | Password min. 10 chars; email confirmation on |
 | Name (optional), memory consent, onboarding confirmations | `public.profiles` | No conversation content |
-| Memory notes (opt-in) | `public.memories` | Only what the user writes; deletable individually or all at once |
+| Memory notes (opt-in) | `public.memories` | Only what he writes in Settings or explicitly saves from his own chat message; crisis-level text is refused; deletable individually or all at once |
 | Growth plans, steps, step notes | `public.growth_plans`, `public.plan_steps` | Open steps reach the model only with memory on; focus text is sent to OpenAI only when he asks for tailoring |
 | Monthly reflections | `public.reflections` | Never sent to the model; can't be edited, only deleted |
 | Text conversation | **Not stored by the app** | Lives in the browser tab only. Sent to OpenAI per message |
