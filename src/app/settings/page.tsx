@@ -1,0 +1,159 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { Suspense, type ReactNode } from "react";
+import { AppHeader, PageLoading } from "@/components/app-header";
+import { getCurrentUser } from "@/lib/supabase/server";
+import { setReflectionPrompts } from "@/app/reflect/actions";
+import { deleteAllMemories, deleteMemory, setMemoryEnabled } from "./actions";
+import { isCheckinFrequency } from "@/lib/checkins";
+import { AddMemoryForm, CheckinForm, DeleteAccountForm, DisplayNameForm } from "./forms";
+
+export const metadata: Metadata = { title: "Settings · Fatherly Friend" };
+
+export default function SettingsPage() {
+  return (
+    <>
+      <AppHeader current="settings" />
+      <main className="flex-1">
+        <Suspense fallback={<PageLoading label="Loading your settings…" />}>
+          <SettingsContent />
+        </Suspense>
+      </main>
+    </>
+  );
+}
+
+function Card({ title, intro, children }: { title: string; intro?: ReactNode; children: ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-line bg-ink-2 p-6">
+      <h2 className="font-serif text-2xl text-cream">{title}</h2>
+      {intro && <p className="mt-2 leading-relaxed text-sand">{intro}</p>}
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+const CATEGORY_LABEL: Record<string, string> = {
+  goal: "Goal",
+  experience: "Experience",
+  preference: "Preference",
+  challenge: "Challenge",
+  achievement: "Achievement",
+  other: "Other",
+};
+
+async function SettingsContent() {
+  const { supabase, user } = await getCurrentUser();
+  if (!supabase || !user) redirect("/login?next=/settings");
+
+  const [{ data: profile }, { data: memories }] = await Promise.all([
+    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency").eq("id", user.id).maybeSingle(),
+    supabase.from("memories").select("id, category, content, source, created_at").order("created_at", { ascending: false }),
+  ]);
+  const memoryOn = Boolean(profile?.memory_enabled);
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-6 px-4 py-10 sm:px-6">
+      <h1 className="font-serif text-4xl text-cream">Settings</h1>
+      <p className="text-sand">Signed in as {user.email}</p>
+
+      <Card title="What he calls you" intro="Optional. Change or remove it any time.">
+        <DisplayNameForm current={profile?.display_name ?? null} />
+      </Card>
+
+      <Card
+        title="Memory"
+        intro={
+          memoryOn
+            ? "On. He keeps these notes, and the open steps in your active plans, in mind during conversations. Only what you write is stored."
+            : "Off. Nothing carries over between conversations. Turn it on to save notes he'll keep in mind."
+        }
+      >
+        <form action={setMemoryEnabled}>
+          <input type="hidden" name="enabled" value={memoryOn ? "false" : "true"} />
+          <button type="submit" className="rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
+            {memoryOn ? "Turn memory off" : "Turn memory on"}
+          </button>
+        </form>
+
+        {memoryOn && (
+          <div className="mt-6">
+            <AddMemoryForm />
+          </div>
+        )}
+
+        {memories && memories.length > 0 && (
+          <div className="mt-6">
+            {!memoryOn && (
+              <p className="mb-3 text-sm text-dust">
+                These saved notes aren&apos;t being used while memory is off. Delete them if you
+                don&apos;t want them kept.
+              </p>
+            )}
+            <ul className="divide-y divide-line rounded-xl border border-line">
+              {memories.map((m) => (
+                <li key={m.id} className="flex items-start justify-between gap-4 p-4">
+                  <div>
+                    <span className="text-xs uppercase tracking-wider text-brass">{CATEGORY_LABEL[m.category] ?? m.category}</span>
+                    {m.source === "conversation" && <span className="ml-2 text-xs text-dust">from a conversation</span>}
+                    <p className="mt-1 leading-relaxed text-cream">{m.content}</p>
+                  </div>
+                  <form action={deleteMemory}>
+                    <input type="hidden" name="id" value={m.id} />
+                    <button type="submit" className="text-sm text-dust hover:text-alert" aria-label={`Delete note: ${m.content}`}>
+                      Delete
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+            <form action={deleteAllMemories} className="mt-3">
+              <button type="submit" className="text-sm text-dust hover:text-alert">Delete all notes</button>
+            </form>
+          </div>
+        )}
+      </Card>
+
+      <Card
+        title="Check-ins"
+        intro="A short note from Fatherly Friend when you open the app, if you'd like one. Only ever inside the app: no emails, no notifications. Off by default."
+      >
+        <CheckinForm current={isCheckinFrequency(profile?.checkin_frequency) ? profile.checkin_frequency : "off"} />
+      </Card>
+
+      <Card
+        title="Monthly reflection reminders"
+        intro={
+          profile?.reflection_prompts_enabled === false
+            ? "Off. You can still reflect any time from the Reflect page."
+            : "On. About once a month, a quiet note in the app offers a reflection. Nothing is ever sent to you outside the app."
+        }
+      >
+        <form action={setReflectionPrompts}>
+          <input type="hidden" name="enabled" value={profile?.reflection_prompts_enabled === false ? "true" : "false"} />
+          <button type="submit" className="rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
+            {profile?.reflection_prompts_enabled === false ? "Turn reminders on" : "Turn reminders off"}
+          </button>
+        </form>
+      </Card>
+
+      <Card title="Your data" intro="Download everything Fatherly Friend stores about you: profile, memory notes, plans and reflections.">
+        <a href="/api/account/export" className="inline-block rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
+          Download my data
+        </a>
+      </Card>
+
+      <Card title="Sign out">
+        <form action="/auth/signout" method="post">
+          <button type="submit" className="rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
+            Sign out
+          </button>
+        </form>
+      </Card>
+
+      <Card title="Delete account" intro="This can't be undone.">
+        <DeleteAccountForm />
+      </Card>
+    </div>
+  );
+}
