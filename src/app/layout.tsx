@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { DemoProvider } from "@/lib/store";
 import { AppShell, DemoBanner } from "@/components/AppShell";
+import { VoiceProvider } from "@/lib/voice";
 
 export const metadata: Metadata = {
   title: "MARcheck — eMAR demo (not for clinical use)",
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <DemoBanner />
         <DemoProvider>
-          <AppShell>{children}</AppShell>
+          <VoiceProvider>
+            <AppShell>{children}</AppShell>
+          </VoiceProvider>
         </DemoProvider>
       </body>
     </html>

@@ -76,6 +76,17 @@ Copy `.env.example` to `.env.local` and set `ANTHROPIC_API_KEY`. Without a key, 
 7. **Switch to David Brooks (Administrator).** Add a resident, a staff account or a mock medication order, or discontinue an order. **Onboarding** tracks progress through these steps automatically from the audit trail.
 8. **Admin → Facility & demo → Reset demo data** restores fresh fictional data anchored to the current time.
 
+## Voice read-out
+
+MARcheck reads aloud to the person giving medications, using the device's built-in voice (Web Speech API). It needs no internet connection or API key, and no audio leaves the device.
+
+- **Opening a dose** reads allergies first, then the resident and room, then the medication, dose, route, scheduled time and instructions as written on the order.
+- **The confirm step** reads back the chosen outcome, the medication, the resident and the reason.
+- **After saving** it announces what was recorded and by whom.
+- The **Voice on/off** button in the header mutes it, and the setting is remembered on each device. **Repeat** in the dose screen replays the last message.
+
+Voice only reads back what is already on the order and the record. It never suggests whether to give, hold or change a medication, and the caregiver still taps to choose and confirm. Voice quality depends on the device: iPad and iPhone voices are usually the clearest. On iPhone and iPad, turn off silent mode to hear it.
+
 ## Features vs. the brief
 
 | Area | What's implemented |
@@ -101,6 +112,8 @@ src/
     audit.ts           append helper, demo hash chain, verification, CSV export
     assistant.ts       rules engine + clinical-advice guard
     reports.ts         daily / exceptions / completeness aggregations
+    speech.ts          spoken read-out scripts (allergies first, unit expansion)
+    voice.tsx          device text-to-speech provider, on/off preference, repeat
     seed.ts            fictional residents, staff, orders, and 3 days of simulated history
     store.tsx          React context; persists DemoState to localStorage
   components/          AppShell (banner, nav, role switcher, notifications), DoseDialog, UI kit

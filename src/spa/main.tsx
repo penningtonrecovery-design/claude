@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { StaticRouter, useStaticRouter } from "./router";
 import { DemoProvider } from "@/lib/store";
 import { AppShell, DemoBanner } from "@/components/AppShell";
+import { VoiceProvider } from "@/lib/voice";
 import Home from "@/app/page";
 import LoginPage from "@/app/login/page";
 import CaregiverDashboard from "@/app/caregiver/page";
@@ -56,11 +57,13 @@ createRoot(document.getElementById("root")!).render(
   <StaticRouter>
     <DemoBanner />
     <DemoProvider>
-      <AppShell>
-        <Suspense fallback={null}>
-          <Routes />
-        </Suspense>
-      </AppShell>
+      <VoiceProvider>
+        <AppShell>
+          <Suspense fallback={null}>
+            <Routes />
+          </Suspense>
+        </AppShell>
+      </VoiceProvider>
     </DemoProvider>
   </StaticRouter>,
 );

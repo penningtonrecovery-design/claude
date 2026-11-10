@@ -196,3 +196,42 @@ describe("seed, reports and assistant", () => {
     expect(doseIdFor("ord_x", "2026-01-02", "08:00")).toBe("ord_x@2026-01-02T08:00");
   });
 });
+
+import { chunkForSpeech, confirmAnnouncement, doseAnnouncement, savedAnnouncement, speakable } from "@/lib/speech";
+
+describe("voice read-outs", () => {
+  const s = createSeedState(NOW);
+  const views = buildDoseViews(s, TODAY, TODAY, NOW);
+  const withAllergy = views.find((v) => v.resident.allergies.length > 0)!;
+  const noAllergy = views.find((v) => v.resident.allergies.length === 0)!;
+
+  it("announces allergies first, then resident, room and the order as written", () => {
+    const text = doseAnnouncement(withAllergy);
+    expect(text.startsWith(`Allergy alert: ${withAllergy.resident.allergies.join(", ")}`)).toBe(true);
+    expect(text).toContain(`room ${withAllergy.resident.room}`);
+    expect(text).toContain(withAllergy.order.name);
+    expect(doseAnnouncement(noAllergy).startsWith("No known allergies recorded.")).toBe(true);
+  });
+
+  it("expands units so they are spoken clearly", () => {
+    expect(speakable("Levothyroxine 50 mcg, 500 mg, 17 g, 1000 IU, 0.005%")).toBe(
+      "Levothyroxine 50 micrograms, 500 milligrams, 17 grams, 1000 international units, 0.005 percent",
+    );
+  });
+
+  it("reads back the outcome before and after saving, without clinical advice", () => {
+    const c = confirmAnnouncement(withAllergy, "refused", "Resident declined");
+    expect(c).toMatch(/^Please confirm\. Refused\./);
+    expect(c).toContain("Reason: Resident declined.");
+    const done = savedAnnouncement(withAllergy, "administered", "Maria Santos");
+    expect(done).toContain("Administered recorded for");
+    for (const v of views) expect(containsClinicalAdvice(doseAnnouncement(v)), doseAnnouncement(v)).toBe(false);
+    expect(containsClinicalAdvice(c)).toBe(false);
+  });
+
+  it("splits long text into short chunks", () => {
+    const chunks = chunkForSpeech("One. Two two two. Three three three three.", 20);
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks.join(" ")).toBe("One. Two two two. Three three three three.");
+  });
+});

@@ -15,8 +15,11 @@ import {
   ShieldAlert,
   ShieldCheck,
   Users,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { useDemo } from "@/lib/store";
+import { useVoice } from "@/lib/voice";
 import { markNotificationsRead, notificationsFor } from "@/lib/actions";
 import { ROLE_LABEL, type Role } from "@/lib/types";
 import { fmtDateTime } from "@/lib/time";
@@ -98,6 +101,27 @@ function Notifications() {
   );
 }
 
+function VoiceToggle() {
+  const { supported, enabled, setEnabled } = useVoice();
+  if (!supported) return null;
+  const Icon = enabled ? Volume2 : VolumeX;
+  return (
+    <button
+      onClick={() => setEnabled(!enabled)}
+      aria-pressed={enabled}
+      aria-label={enabled ? "Voice read-out on. Tap to mute." : "Voice read-out off. Tap to turn on."}
+      title={enabled ? "Voice on" : "Voice off"}
+      className={cx(
+        "inline-flex h-11 items-center gap-1.5 rounded-xl px-2.5 text-sm font-semibold",
+        enabled ? "bg-white/15 text-white hover:bg-white/25" : "text-blue-100 hover:bg-white/15",
+      )}
+    >
+      <Icon className="h-6 w-6" aria-hidden />
+      <span className="hidden sm:inline">{enabled ? "Voice on" : "Voice off"}</span>
+    </button>
+  );
+}
+
 function UserSwitcher() {
   const { state, user, login, logout } = useDemo();
   const router = useRouter();
@@ -171,6 +195,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             DEMO ONLY — NOT FOR CLINICAL USE
           </span>
           <div className="flex items-center gap-1">
+            <VoiceToggle />
             <Notifications />
             <UserSwitcher />
           </div>

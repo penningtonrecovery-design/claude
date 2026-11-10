@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { AlertTriangle, Ban, CheckCircle2, PauseCircle, ShieldCheck, XCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AlertTriangle, Ban, CheckCircle2, PauseCircle, RotateCcw, ShieldCheck, XCircle } from "lucide-react";
 import { useDemo } from "@/lib/store";
+import { useVoice } from "@/lib/voice";
+import { confirmAnnouncement, doseAnnouncement, savedAnnouncement } from "@/lib/speech";
 import { canDocumentFor, correctRecord, documentDose, OUTCOMES, REASONS } from "@/lib/actions";
 import { getDoseView } from "@/lib/doses";
 import { OUTCOME_LABEL, ROLE_LABEL, type DoseView, type Outcome } from "@/lib/types";
@@ -20,10 +22,15 @@ type Step = "details" | "outcome" | "confirm" | "done";
 
 export function DoseDialog({ doseId, onClose }: { doseId: string | null; onClose: () => void }) {
   const { state, now, user, run } = useDemo();
+  const voice = useVoice();
   const view = doseId ? getDoseView(state, doseId, now) : undefined;
+  const close = () => {
+    voice.stop();
+    onClose();
+  };
   return (
-    <Dialog open={!!doseId && !!view} onClose={onClose} title={view ? `${view.order.name} ${view.order.strength}` : "Dose"} wide>
-      {view && user && <DoseFlow key={view.id} view={view} onClose={onClose} run={run} userId={user.id} />}
+    <Dialog open={!!doseId && !!view} onClose={close} title={view ? `${view.order.name} ${view.order.strength}` : "Dose"} wide>
+      {view && user && <DoseFlow key={view.id} view={view} onClose={close} run={run} userId={user.id} />}
     </Dialog>
   );
 }
@@ -40,6 +47,33 @@ function DoseFlow({ view, onClose, run, userId }: { view: DoseView; onClose: () 
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const voice = useVoice();
+
+  // Voice read-outs: the dose on open, the summary on the confirm step, the result after saving.
+  // Snapshot the view at the moment each step starts so re-renders don't re-speak.
+  const viewRef = useRef(view);
+  viewRef.current = view;
+  const spokenFor = useRef<string | null>(null);
+  useEffect(() => {
+    const v = viewRef.current;
+    let key: string | null = null;
+    let text: string | null = null;
+    if (step === "details") {
+      key = `details:${v.id}`;
+      text = doseAnnouncement(v);
+    } else if (step === "confirm" && outcome) {
+      key = `confirm:${outcome}:${reason}`;
+      text = confirmAnnouncement(v, outcome, reason, mode === "correct");
+    } else if (step === "done" && outcome) {
+      key = `done:${savedAt}`;
+      text = savedAnnouncement(v, outcome, user.name, mode === "correct");
+    }
+    if (key && text && spokenFor.current !== key) {
+      spokenFor.current = key;
+      voice.speak(text);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   const staffName = (id: string) => state.staff.find((s) => s.id === id)?.name ?? id;
   const r = view.resident;
@@ -75,6 +109,16 @@ function DoseFlow({ view, onClose, run, userId }: { view: DoseView; onClose: () 
         </div>
       </div>
       <StatusBadge status={view.status} dueNow={view.dueNow} />
+      {voice.supported && (
+        <button
+          type="button"
+          onClick={() => (voice.enabled ? voice.repeat() : voice.setEnabled(true))}
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border-2 border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800 hover:border-slate-500"
+          aria-label={voice.enabled ? "Repeat the spoken read-out" : "Turn voice read-out on"}
+        >
+          <RotateCcw className="h-4 w-4" aria-hidden /> {voice.enabled ? "Repeat" : "Voice off"}
+        </button>
+      )}
       {r.allergies.length > 0 ? (
         <div className="w-full rounded-lg border-2 border-red-600 bg-red-50 px-3 py-1.5 font-bold text-red-800">
           <AlertTriangle className="mr-1 inline h-5 w-5" aria-hidden /> Allergies: {r.allergies.join(", ")}
