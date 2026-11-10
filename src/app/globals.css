@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-brand-50: #eef6ff;
+  --color-brand-100: #d9eaff;
+  --color-brand-600: #1d5fbf;
+  --color-brand-700: #174c99;
+  --color-brand-800: #123a75;
+  --color-brand-900: #0e2b57;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  font-size: 17px;
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16.5px;
+  }
+}
+
+body {
+  background: #f4f6fa;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+
+dialog::backdrop {
+  background: rgb(15 23 42 / 0.55);
+}
+
+dialog[open] {
+  animation: pop 120ms ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: translateY(6px);
+    opacity: 0.6;
+  }
+}
+
+@media print {
+  html {
+    font-size: 11pt;
+  }
+  body {
+    background: white;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .print-break {
+    break-before: page;
+  }
+  table {
+    break-inside: auto;
+  }
+  tr {
+    break-inside: avoid;
+  }
+}
+
+.print-only {
+  display: none;
+}
