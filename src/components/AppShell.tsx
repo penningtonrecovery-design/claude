@@ -156,7 +156,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const items = NAV.filter((n) => n.roles.includes(user.role));
   return (
     <div className="min-h-screen">
-      <header className="no-print sticky top-0 z-30 bg-brand-900 text-white shadow">
+      <header className="no-print sticky top-[env(safe-area-inset-top,0px)] z-30 bg-brand-900 text-white shadow">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-3 py-2">
           <Link href={homeFor(user.role)} className="flex items-center gap-2">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white text-brand-800">

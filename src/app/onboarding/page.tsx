@@ -14,7 +14,7 @@ const STEPS: { title: string; body: string; href: string; cta: string; done: Aud
   { title: "Configure a mock medication schedule", body: "Add a fictional order with scheduled times. It appears on the med pass immediately.", href: "/admin", cta: "Admin → Medication schedules", done: ["order.created", "order.schedule_changed"] },
   { title: "Run a med pass", body: "Switch to a caregiver (header menu), open a due medication, choose an outcome, and confirm.", href: "/caregiver", cta: "Open med pass", done: ["dose.documented"] },
   { title: "Review exceptions as a supervisor", body: "Acknowledge or escalate a refused dose, or send a documentation reminder.", href: "/supervisor", cta: "Supervisor dashboard", done: ["review.acknowledged", "review.escalated", "reminder.sent"] },
-  { title: "Print a report or export the audit log", body: "Generate an inspection-style report or download the mock audit export.", href: "/reports", cta: "Open reports", done: ["report.generated", "audit.exported"] },
+  { title: "Print a report or export the audit log", body: "Generate an inspection-style report or export the mock audit log.", href: "/reports", cta: "Open reports", done: ["report.generated", "audit.exported"] },
 ];
 
 export default function OnboardingPage() {

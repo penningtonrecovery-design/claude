@@ -39,6 +39,20 @@ npm test
 
 To open the app from a tablet or phone on the same network, run `npm run dev -- -H 0.0.0.0` and browse to `http://<your-computer-ip>:3000`.
 
+### Hosted single-file demo
+
+```bash
+npm run build:static
+```
+
+This bundles the same pages into one self-contained file, `dist-static/caremar.html`, with all JavaScript and CSS inline and no server needed. It was used to publish the shareable demo link. The hosted version differs from the full app in three ways, all because the page runs in a locked-down frame:
+
+- It can't open the print dialog, so the Print button is hidden.
+- It can't download files, so the audit export copies CSV to the clipboard instead.
+- It can't call APIs, so the AI assistant always runs in offline rules mode.
+
+Everything else, including sign-in, role switching and all workflows, is the same code.
+
 ### Optional: Claude wording for the AI assistant
 
 Copy `.env.example` to `.env.local` and set `ANTHROPIC_API_KEY`. Without a key, the assistant runs in offline rules mode, and the demo is complete either way.
@@ -90,7 +104,9 @@ src/
     seed.ts            fictional residents, staff, orders, and 3 days of simulated history
     store.tsx          React context; persists DemoState to localStorage
   components/          AppShell (banner, nav, role switcher, notifications), DoseDialog, UI kit
+  spa/                 static single-file build: tiny router + next/link & next/navigation shims
   app/                 Next.js App Router pages + /api/assistant route
+scripts/build-static.mjs  esbuild + Tailwind CLI → dist-static/caremar.html
 supabase/schema.sql    sketch of the future Postgres/Supabase schema (not used by the demo)
 tests/domain.test.ts   Vitest suite
 decisions/log.md       architectural decision log

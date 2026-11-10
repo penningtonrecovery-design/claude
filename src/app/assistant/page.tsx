@@ -7,6 +7,7 @@ import { useDemo } from "@/lib/store";
 import { ASSISTANT_SCOPE_NOTE, rulesSummary, runAssistant, type Finding, type Severity } from "@/lib/assistant";
 import { Button, Card, Empty, PageHeader, Tabs, cx } from "@/components/ui";
 import { RequireRole } from "@/components/AppShell";
+import { STATIC_DEMO } from "@/lib/env";
 
 export default function AssistantPage() {
   return (
@@ -31,6 +32,10 @@ function Assistant() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (STATIC_DEMO) {
+      setLlm(false);
+      return;
+    }
     fetch("/api/assistant")
       .then((r) => r.json())
       .then((d) => setLlm(Boolean(d.llmAvailable)))

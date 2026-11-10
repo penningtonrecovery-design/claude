@@ -9,6 +9,7 @@ import { fmtDateTime } from "@/lib/time";
 import { ROLE_LABEL } from "@/lib/types";
 import { Button, Card, PageHeader, inputCls } from "@/components/ui";
 import { RequireRole } from "@/components/AppShell";
+import { STATIC_DEMO } from "@/lib/env";
 
 export default function AuditPage() {
   return (
@@ -35,6 +36,17 @@ function AuditTrail() {
   const [action, setAction] = useState("all");
   const [check, setCheck] = useState<ChainCheck | null>(null);
   const [limit, setLimit] = useState(100);
+  const [copyMsg, setCopyMsg] = useState<string | null>(null);
+
+  const copyCsv = async () => {
+    run((s, a, t) => logReportGenerated(s, a.id, "audit-export", t));
+    try {
+      await navigator.clipboard.writeText(auditToCsv(state.audit, state.settings.facilityName));
+      setCopyMsg("Audit log copied as CSV. Paste it into a spreadsheet.");
+    } catch {
+      setCopyMsg("Your browser blocked clipboard access. Run the app locally to download the export.");
+    }
+  };
 
   const actions = useMemo(() => [...new Set(state.audit.map((e) => e.action))].sort(), [state.audit]);
   const actors = useMemo(() => [...new Map(state.audit.map((e) => [e.actorId, e.actorName])).entries()], [state.audit]);
@@ -65,12 +77,20 @@ function AuditTrail() {
             <Button variant="secondary" onClick={() => setCheck(verifyAuditChain(state.audit))}>
               <ShieldCheck className="h-5 w-5" aria-hidden /> Verify chain
             </Button>
-            <Button variant="secondary" onClick={() => exportAs("csv")}>
-              <Download className="h-5 w-5" aria-hidden /> Export CSV
-            </Button>
-            <Button variant="secondary" onClick={() => exportAs("json")}>
-              <Download className="h-5 w-5" aria-hidden /> Export JSON
-            </Button>
+            {STATIC_DEMO ? (
+              <Button variant="secondary" onClick={copyCsv}>
+                <Download className="h-5 w-5" aria-hidden /> Copy CSV export
+              </Button>
+            ) : (
+              <>
+                <Button variant="secondary" onClick={() => exportAs("csv")}>
+                  <Download className="h-5 w-5" aria-hidden /> Export CSV
+                </Button>
+                <Button variant="secondary" onClick={() => exportAs("json")}>
+                  <Download className="h-5 w-5" aria-hidden /> Export JSON
+                </Button>
+              </>
+            )}
           </>
         }
       />
@@ -79,6 +99,11 @@ function AuditTrail() {
         be detected. Data lives in this browser only; a production system needs server-side, write-once storage, cryptographic hashing, time synchronisation and
         independent validation.
       </Card>
+      {copyMsg && (
+        <div role="status" className="mb-4 rounded-xl border-2 border-blue-300 bg-blue-50 px-4 py-3 font-semibold text-blue-900">
+          {copyMsg}
+        </div>
+      )}
       {check && (
         <div
           role="status"

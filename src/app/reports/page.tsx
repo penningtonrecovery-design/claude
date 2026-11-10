@@ -9,6 +9,7 @@ import { addDays, dateKey, fmtDate, fmtDateTime, fmtHHMM, fmtTime } from "@/lib/
 import { OUTCOME_LABEL } from "@/lib/types";
 import { Button, Card, PageHeader, StatusBadge, Tabs, inputCls } from "@/components/ui";
 import { RequireRole } from "@/components/AppShell";
+import { STATIC_DEMO } from "@/lib/env";
 
 type Tab = "daily" | "exceptions" | "completeness";
 const TITLES: Record<Tab, string> = {
@@ -50,11 +51,18 @@ function Reports() {
         title="Reports"
         subtitle="Inspection-style reports generated from fictional demo data."
         actions={
-          <Button onClick={print}>
-            <Printer className="h-5 w-5" aria-hidden /> Print / save as PDF
-          </Button>
+          STATIC_DEMO ? undefined : (
+            <Button onClick={print}>
+              <Printer className="h-5 w-5" aria-hidden /> Print / save as PDF
+            </Button>
+          )
         }
       />
+      {STATIC_DEMO && (
+        <p className="no-print mb-4 rounded-xl border-2 border-slate-300 bg-white px-4 py-2 text-slate-700">
+          Printing is turned off in this hosted demo. Run the app locally (see README) to print or save reports as PDF.
+        </p>
+      )}
       <Tabs
         tabs={[
           { id: "daily", label: "Daily summary" },
