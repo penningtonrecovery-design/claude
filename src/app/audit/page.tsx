@@ -58,10 +58,10 @@ function AuditTrail() {
   const exportAs = (fmt: "csv" | "json") => {
     run((s, a, t) => logReportGenerated(s, a.id, "audit-export", t));
     const stamp = new Date().toISOString().slice(0, 10);
-    if (fmt === "csv") download(`caremar-DEMO-audit-${stamp}.csv`, auditToCsv(state.audit, state.settings.facilityName), "text/csv");
+    if (fmt === "csv") download(`marcheck-DEMO-audit-${stamp}.csv`, auditToCsv(state.audit, state.settings.facilityName), "text/csv");
     else
       download(
-        `caremar-DEMO-audit-${stamp}.json`,
+        `marcheck-DEMO-audit-${stamp}.json`,
         JSON.stringify({ notice: "DEMO PROTOTYPE EXPORT - NOT A VALIDATED COMPLIANCE SYSTEM - FICTIONAL DATA", facility: state.settings.facilityName, exportedAt: new Date().toISOString(), events: state.audit }, null, 2),
         "application/json",
       );

@@ -43,7 +43,7 @@ export interface Actor {
   role: Role | "system";
 }
 
-export const SYSTEM_ACTOR: Actor = { id: "system", name: "CareMAR Demo System", role: "system" };
+export const SYSTEM_ACTOR: Actor = { id: "system", name: "Marcheck Demo System", role: "system" };
 
 let idCounter = 0;
 export function newId(prefix: string): string {

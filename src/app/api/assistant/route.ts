@@ -11,7 +11,7 @@ import { containsClinicalAdvice } from "@/lib/assistant";
 
 export const runtime = "nodejs";
 
-const SYSTEM = `You are the administrative documentation assistant inside CareMAR, a DEMONSTRATION eMAR prototype for small residential care homes. All data is fictional.
+const SYSTEM = `You are the administrative documentation assistant inside Marcheck, a DEMONSTRATION eMAR prototype for small residential care homes. All data is fictional.
 
 Your only job: turn a list of documentation findings (already detected by a rules engine) into a short, plain-language review summary for a care supervisor, explaining where staff may need to look in the records.
 

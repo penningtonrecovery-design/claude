@@ -1,9 +1,9 @@
-# CareMAR — eMAR demonstration prototype
+# Marcheck — eMAR demonstration prototype
 
 > **DEMO ONLY — NOT FOR CLINICAL USE.**
-> CareMAR is a market-validation prototype. Every resident, staff member, medication order and record is fictional. It is **not** HIPAA-compliant, FDA-cleared, clinically validated or certified in any way. Do not enter real patient information, and do not use it to administer or document real medication.
+> Marcheck is a market-validation prototype. Every resident, staff member, medication order and record is fictional. It is **not** HIPAA-compliant, FDA-cleared, clinically validated or certified in any way. Do not enter real patient information, and do not use it to administer or document real medication.
 
-CareMAR is an electronic Medication Administration Record (eMAR) for small residential care homes (about 4–16 residents). It shows how caregivers document doses, how supervisors catch gaps and exceptions, and how administrators set up a home. It runs entirely in the browser using fictional seed data, with no accounts, database or API keys needed.
+Marcheck is an electronic Medication Administration Record (eMAR) for small residential care homes (about 4–16 residents). It shows how caregivers document doses, how supervisors catch gaps and exceptions, and how administrators set up a home. It runs entirely in the browser using fictional seed data, with no accounts, database or API keys needed.
 
 ## Quick start
 
@@ -45,7 +45,7 @@ To open the app from a tablet or phone on the same network, run `npm run dev -- 
 npm run build:static
 ```
 
-This bundles the same pages into one self-contained file, `dist-static/caremar.html`, with all JavaScript and CSS inline and no server needed. It was used to publish the shareable demo link. The hosted version differs from the full app in three ways, all because the page runs in a locked-down frame:
+This bundles the same pages into one self-contained file, `dist-static/marcheck.html`, with all JavaScript and CSS inline and no server needed. It was used to publish the shareable demo link. The hosted version differs from the full app in three ways, all because the page runs in a locked-down frame:
 
 - It can't open the print dialog, so the Print button is hidden.
 - It can't download files, so the audit export copies CSV to the clipboard instead.
@@ -106,7 +106,7 @@ src/
   components/          AppShell (banner, nav, role switcher, notifications), DoseDialog, UI kit
   spa/                 static single-file build: tiny router + next/link & next/navigation shims
   app/                 Next.js App Router pages + /api/assistant route
-scripts/build-static.mjs  esbuild + Tailwind CLI → dist-static/caremar.html
+scripts/build-static.mjs  esbuild + Tailwind CLI → dist-static/marcheck.html
 supabase/schema.sql    sketch of the future Postgres/Supabase schema (not used by the demo)
 tests/domain.test.ts   Vitest suite
 decisions/log.md       architectural decision log

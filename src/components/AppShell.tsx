@@ -163,7 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <ClipboardList aria-hidden className="h-6 w-6" />
             </span>
             <span>
-              <span className="block text-lg font-extrabold leading-tight">CareMAR</span>
+              <span className="block text-lg font-extrabold leading-tight">Marcheck</span>
               <span className="block text-xs text-blue-100">{state.settings.facilityName}</span>
             </span>
           </Link>
@@ -201,7 +201,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-7xl px-3 py-5 sm:px-5">{children}</main>
       <footer className="no-print mx-auto max-w-7xl px-4 pb-8 text-center text-sm text-slate-500">
-        CareMAR prototype for demonstration and market validation only. Do not use for real medication administration. All names and orders are fictional.
+        Marcheck prototype for demonstration and market validation only. Do not use for real medication administration. All names and orders are fictional.
       </footer>
     </div>
   );

@@ -5,7 +5,8 @@ import { createSeedState, STATE_VERSION } from "./seed";
 import { login as loginAction, logout as logoutAction } from "./actions";
 import { DemoRuleError, type DemoState, type Staff } from "./types";
 
-const STORAGE_KEY = "caremar-demo-state";
+const STORAGE_KEY = "marcheck-demo-state";
+const LEGACY_KEY = "caremar-demo-state"; // pre-rename key, read once so existing demo data carries over
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 type Transition = (state: DemoState, actor: Staff, now: number) => DemoState;
@@ -25,7 +26,7 @@ const Ctx = createContext<DemoContext | null>(null);
 
 function load(): DemoState | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as DemoState;
     return parsed.version === STATE_VERSION ? parsed : null;
