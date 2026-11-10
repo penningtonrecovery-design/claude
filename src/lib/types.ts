@@ -1,4 +1,4 @@
-// Core domain types for the Marcheck demo.
+// Core domain types for the MARcheck demo.
 // All data is fictional. Timestamps are epoch milliseconds (local time zone).
 
 export type Role = "caregiver" | "supervisor" | "admin";

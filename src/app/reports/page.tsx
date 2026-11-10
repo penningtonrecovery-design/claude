@@ -106,7 +106,7 @@ function Reports() {
         {tab === "exceptions" && <Exceptions from={from} to={to} staffName={staffName} />}
         {tab === "completeness" && <Completeness from={from} to={to} />}
         <p className="mt-6 border-t border-slate-300 pt-3 text-sm text-slate-600">
-          Reviewed by: ______________________ Date: __________ · Marcheck prototype output. Not validated for inspection or compliance purposes.
+          Reviewed by: ______________________ Date: __________ · MARcheck prototype output. Not validated for inspection or compliance purposes.
         </p>
       </Card>
     </div>

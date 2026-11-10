@@ -24,7 +24,7 @@ export default function LoginPage() {
           <ClipboardList className="h-8 w-8" aria-hidden />
         </span>
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Marcheck</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900">MARcheck</h1>
           <p className="text-slate-600">Electronic Medication Administration Record — demonstration prototype</p>
         </div>
       </div>

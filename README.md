@@ -1,9 +1,9 @@
-# Marcheck — eMAR demonstration prototype
+# MARcheck — eMAR demonstration prototype
 
 > **DEMO ONLY — NOT FOR CLINICAL USE.**
-> Marcheck is a market-validation prototype. Every resident, staff member, medication order and record is fictional. It is **not** HIPAA-compliant, FDA-cleared, clinically validated or certified in any way. Do not enter real patient information, and do not use it to administer or document real medication.
+> MARcheck is a market-validation prototype. Every resident, staff member, medication order and record is fictional. It is **not** HIPAA-compliant, FDA-cleared, clinically validated or certified in any way. Do not enter real patient information, and do not use it to administer or document real medication.
 
-Marcheck is an electronic Medication Administration Record (eMAR) for small residential care homes (about 4–16 residents). It shows how caregivers document doses, how supervisors catch gaps and exceptions, and how administrators set up a home. It runs entirely in the browser using fictional seed data, with no accounts, database or API keys needed.
+MARcheck is an electronic Medication Administration Record (eMAR) for small residential care homes (about 4–16 residents). It shows how caregivers document doses, how supervisors catch gaps and exceptions, and how administrators set up a home. It runs entirely in the browser using fictional seed data, with no accounts, database or API keys needed.
 
 ## Quick start
 

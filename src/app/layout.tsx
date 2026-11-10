@@ -4,7 +4,7 @@ import { DemoProvider } from "@/lib/store";
 import { AppShell, DemoBanner } from "@/components/AppShell";
 
 export const metadata: Metadata = {
-  title: "Marcheck — eMAR demo (not for clinical use)",
+  title: "MARcheck — eMAR demo (not for clinical use)",
   description: "Demonstration electronic Medication Administration Record for small residential care homes. Fictional data only.",
 };
 

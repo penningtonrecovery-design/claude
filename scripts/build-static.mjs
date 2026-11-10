@@ -1,4 +1,4 @@
-// Builds Marcheck as ONE self-contained HTML file (inline JS + CSS, no server).
+// Builds MARcheck as ONE self-contained HTML file (inline JS + CSS, no server).
 // Used for hosting the demo as a static page. Output: dist-static/marcheck.html
 import { build } from "esbuild";
 import { execFileSync } from "node:child_process";
@@ -34,10 +34,10 @@ const result = await build({
 const js = result.outputFiles[0].text.replace(/<\/script/gi, "<\\/script");
 const css = readFileSync(path.join(out, "app.css"), "utf8").replace(/<\/style/gi, "<\\/style");
 
-const html = `<title>Marcheck</title>
-<meta name="description" content="Marcheck eMAR demonstration prototype. Fictional data only. Not for clinical use.">
+const html = `<title>MARcheck</title>
+<meta name="description" content="MARcheck eMAR demonstration prototype. Fictional data only. Not for clinical use.">
 <style>${css}</style>
-<noscript>Marcheck needs JavaScript. DEMO ONLY — NOT FOR CLINICAL USE.</noscript>
+<noscript>MARcheck needs JavaScript. DEMO ONLY — NOT FOR CLINICAL USE.</noscript>
 <div id="root"></div>
 <script>${js}</script>
 `;

@@ -1,4 +1,4 @@
--- Marcheck — FUTURE production schema sketch for PostgreSQL / Supabase.
+-- MARcheck — FUTURE production schema sketch for PostgreSQL / Supabase.
 -- NOT used by the demo (the demo stores fictional data in the browser).
 -- This is a starting point for design review, not a validated clinical data model.
 
