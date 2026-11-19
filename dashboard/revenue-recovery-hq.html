@@ -1,0 +1,1053 @@
+<title>Revenue Recovery HQ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: sticky header with tab strip, one working view below; cards only for KPI tiles and panels. Weight-plate motif for the goal. */
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --sunk:#EAEEE9; --ink:#14201A; --muted:#5B6A62; --line:#D9E0DA;
+  --accent:#1D6B4E; --accent-ink:#FFFFFF; --accent-soft:#DCEDE4;
+  --plate:#D2592A; --plate-soft:#F8E1D6;
+  --good:#1F7A4D; --warn:#B7791F; --bad:#C0392B; --warn-soft:#FBF0DC; --bad-soft:#F9E0DD;
+  --font-display:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --font-body:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#161F1A; --sunk:#1D2822; --ink:#E4ECE7; --muted:#97A69E; --line:#2A3730;
+  --accent:#4DB487; --accent-ink:#06130D; --accent-soft:#1B3B2D;
+  --plate:#EE8455; --plate-soft:#3D2418;
+  --good:#5CC48F; --warn:#E3AA4F; --bad:#EE7468; --warn-soft:#3A2D14; --bad-soft:#3E1D1A;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#161F1A; --sunk:#1D2822; --ink:#E4ECE7; --muted:#97A69E; --line:#2A3730;
+  --accent:#4DB487; --accent-ink:#06130D; --accent-soft:#1B3B2D;
+  --plate:#EE8455; --plate-soft:#3D2418;
+  --good:#5CC48F; --warn:#E3AA4F; --bad:#EE7468; --warn-soft:#3A2D14; --bad-soft:#3E1D1A;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:18px} h3{font-size:15px}
+a{color:var(--accent)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.topbar{display:flex;align-items:center;gap:12px;padding-block:12px 6px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0}
+.brand-mark{width:30px;height:30px;border-radius:50%;background:var(--plate);display:grid;place-items:center;flex:none}
+.brand-mark::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--surface)}
+.brand h1{font-size:18px;white-space:nowrap}
+.brand small{display:block;color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-bottom:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{appearance:none;border:0;background:none;color:var(--muted);font:600 13px var(--font-body);padding:10px 12px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .count{font-weight:500;color:var(--muted);margin-left:4px}
+main{padding-block:20px 60px;display:grid;gap:20px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:600 13px var(--font-body);padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:5px 9px;font-size:12px}
+.btn.danger{color:var(--bad);border-color:var(--bad-soft)}
+.btn.danger[data-armed]{background:var(--bad);color:#fff;border-color:var(--bad)}
+.btn.ghost{border-color:transparent;background:transparent}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spread{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;min-width:0}
+.panel > h2,.panel > .spread{margin-bottom:12px}
+.muted{color:var(--muted)}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px}
+@media (max-width:420px){.grid2{grid-template-columns:1fr}}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.kpis.eight{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:760px){.kpis.eight{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:grid;gap:2px;min-width:0}
+.kpi b{font:600 24px var(--font-display);letter-spacing:-.02em}
+.kpi .sub{font-size:12px;color:var(--muted)}
+/* Goal */
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;display:grid;gap:14px}
+.goal-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.goal-head b{font:700 34px var(--font-display);letter-spacing:-.03em}
+.goal-head b span{color:var(--muted);font-weight:500;font-size:22px}
+.plates{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.plate{height:44px;border-radius:8px;background:var(--plate-soft);position:relative;overflow:hidden;display:flex;align-items:center;padding:0 12px;font-weight:600;font-size:13px;color:var(--muted);min-width:0}
+.plate.on{background:var(--plate);color:#fff}
+.plate span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;background:var(--sunk);white-space:nowrap;position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover td{background:var(--sunk)}
+td.num,th.num{text-align:right}
+td .name{font-weight:600}
+td .sm{font-size:12px;color:var(--muted)}
+.nowrap{white-space:nowrap}
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st-contacted{color:#3B6EA8;background:color-mix(in srgb,#3B6EA8 14%,transparent)}
+.st-replied{color:#7B5BB5;background:color-mix(in srgb,#7B5BB5 14%,transparent)}
+.st-call-booked{color:var(--warn);background:var(--warn-soft)}
+.st-proposal-sent{color:var(--plate);background:var(--plate-soft)}
+.st-won{color:var(--good);background:var(--accent-soft)}
+.st-lost{color:var(--bad);background:var(--bad-soft)}
+.due-over{color:var(--bad);font-weight:600}
+.due-today{color:var(--warn);font-weight:600}
+.flag{display:inline-flex;gap:4px;align-items:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--plate);background:var(--plate-soft);padding:2px 7px;border-radius:4px}
+/* Bars */
+.bars{display:grid;gap:8px}
+.bar-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr auto;gap:10px;align-items:center;font-size:13px}
+.bar-row .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:14px;background:var(--sunk);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;background:var(--accent);border-radius:4px}
+.bar-fill.plate{background:var(--plate)}
+.bar-target{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.bar-row .val{font-weight:600;min-width:56px;text-align:right}
+.funnel{display:grid;gap:6px}
+.f-step{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;font-size:13px}
+.f-bar{height:26px;background:var(--accent);border-radius:4px;justify-self:center;min-width:3px;color:var(--accent-ink);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:12px}
+.f-step .conv{font-size:12px;color:var(--muted);text-align:right}
+@media (max-width:480px){.f-step{grid-template-columns:84px 1fr 64px}}
+/* Actions list */
+.actions{display:grid;gap:0}
+.act{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.act:last-child{border-bottom:0}
+.act .t{font-weight:600}
+.act .d{font-size:12px;color:var(--muted)}
+/* Filters & forms */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 9px;min-width:0;max-width:100%}
+textarea{width:100%;min-height:64px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.filters input[type=search]{flex:1 1 200px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.field{display:grid;gap:4px;min-width:0}
+.field > span{font-size:12px;font-weight:600;color:var(--muted)}
+.field input,.field select{width:100%}
+.field.wide{grid-column:1/-1}
+.check{display:flex;gap:8px;align-items:center;font-size:13px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:12px}
+.section{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:12px}
+.section > h3{display:flex;gap:8px;align-items:center}
+.calc{background:var(--sunk);border-radius:8px;padding:12px;display:grid;gap:10px}
+.calc .out{font:700 22px var(--font-display)}
+.hl{animation:hl 1.6s ease-out}
+@keyframes hl{from{background:var(--plate-soft)}to{background:transparent}}
+@media (prefers-reduced-motion:reduce){.hl{animation:none}}
+/* Dialog */
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--surface);color:var(--ink);width:min(760px,calc(100% - 24px));max-height:calc(100% - 24px)}
+dialog::backdrop{background:rgba(8,14,11,.45)}
+.dlg{display:grid;max-height:calc(100dvh - 26px)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.dlg-body{padding:16px 18px;overflow:auto;display:grid;gap:16px}
+.dlg-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.mini{display:grid;gap:6px}
+.mini-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line);align-items:start}
+.mini-item:last-child{border-bottom:0}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);display:grid;gap:10px;justify-items:center}
+.empty b{color:var(--ink);font-family:var(--font-display);font-size:16px}
+.banner{padding:10px 14px;border-radius:8px;background:var(--warn-soft);color:var(--ink);font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:8px;font-weight:600;font-size:13px;z-index:50;max-width:calc(100% - 32px)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.cols-hide-sm{}
+@media (max-width:640px){.cols-hide-sm{display:none}}
+.month-bars{display:flex;gap:4px;align-items:flex-end;height:70px}
+.month-bars div{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.month-bars div.cs{background:var(--plate)}
+.client-card{display:grid;gap:12px}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true"></div><div><h1>Revenue Recovery HQ</h1><small>DFW gym pipeline · Fitness Revenue Recovery System</small></div></div>
+      <button class="btn" data-act="newTouch">+ Log touch</button>
+      <button class="btn primary" data-act="newGym">+ Add gym</button>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Sections"></nav>
+  </div>
+</header>
+<main class="wrap" id="view"></main>
+<dialog id="dlg"><div class="dlg" id="dlg-inner"></div></dialog>
+<input type="file" id="csv-file" accept=".csv,text/csv" hidden>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+"use strict";
+// ---------- constants ----------
+const STATUSES = ["not contacted","contacted","replied","call booked","proposal sent","won","lost"];
+const RANK = {"not contacted":0,"contacted":1,"replied":2,"call booked":3,"proposal sent":4,"won":5};
+const SOURCES = ["Phone audit","Cold email","Referral","Walk-in","Other"];
+const TYPES = ["Big box","Boutique / studio","CrossFit / functional","Martial arts","Yoga / Pilates","24-hr access","Personal training","Other"];
+const SIZES = ["Small (<300 members)","Medium (300–1,000)","Large (1,000+)"];
+const TOUCH_TYPES = ["Phone audit call","Cold call","Follow-up call","Cold email","Follow-up email","Text / DM","Walk-in","Reply received","Other"];
+const CALL_TYPES = new Set(["Phone audit call","Cold call","Follow-up call"]);
+const MEETING_KINDS = ["Discovery call","Demo","Proposal review","Follow-up call"];
+const MEETING_STATES = ["scheduled","held","no-show","cancelled"];
+const OUTCOMES = ["pending","won","lost","stalled"];
+const OBJECTIONS = ["Price","Timing","Already have a system","Not a priority","Need partner approval","Bad agency experience","Other"];
+const DEFAULTS = {
+  goalClients: 3,
+  targets: {calls:25, contacts:15, booked:3, audits:2, proposals:1},
+  audit: {inquiries:60, closeRate:25, avgDues:60, lifetimeMonths:12},
+  caseStudyMultiple: 3
+};
+const METRICS = [
+  ["calls","Calls (dials)"],["contacts","Contacts (reached DM)"],["booked","Calls booked"],["audits","Phone audits"],["proposals","Proposals sent"]
+];
+const VIEWS = [
+  ["overview","Overview"],["prospects","Prospects"],["audits","Phone audits"],["outreach","Outreach"],
+  ["calls","Calls & proposals"],["objections","Objections"],["clients","Clients"],["results","Client results"],["weekly","Weekly targets"]
+];
+
+// ---------- state ----------
+const S = {
+  gyms: [], touches: [], meetings: [], results: [], settings: structuredClone(DEFAULTS),
+  loaded: new Set(), confirmed: false, slow: false, dbState: "connecting",
+  view: "overview",
+  f: {q:"", city:"", status:"", source:"", type:""}
+};
+try { Object.assign(S.f, JSON.parse(localStorage.getItem("rrhq-filters") || "{}")); } catch {}
+let db = null, downloads = null;
+
+// ---------- helpers ----------
+const $ = (s, r=document) => r.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => "$" + Math.round(+n || 0).toLocaleString("en-US");
+const pct = (a,b) => b ? Math.round(a/b*100) + "%" : "–";
+const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+const pad = n => String(n).padStart(2,"0");
+const iso = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const today = () => iso(new Date());
+const parseD = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+const addDays = (s, n) => { const d = parseD(s); d.setDate(d.getDate()+n); return iso(d); };
+const weekStart = s => { const d = parseD(s); const wd = (d.getDay()+6)%7; d.setDate(d.getDate()-wd); return iso(d); };
+const fmtD = s => s ? parseD(s).toLocaleDateString("en-US",{month:"short",day:"numeric"}) : "";
+const fmtDY = s => s ? parseD(s).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "";
+const fmtMonth = s => s ? new Date(+s.slice(0,4), +s.slice(5,7)-1, 1).toLocaleDateString("en-US",{month:"short",year:"numeric"}) : "";
+const daysBetween = (a,b) => Math.round((parseD(b)-parseD(a))/86400000);
+const slug = s => s.replace(/\s+/g,"-");
+const clean = o => JSON.parse(JSON.stringify(o));
+const gymById = id => S.gyms.find(g => g.id === id);
+const gymName = id => gymById(id)?.name || "(deleted gym)";
+const opts = (list, cur, blank) => (blank !== undefined ? `<option value="">${esc(blank)}</option>` : "") +
+  [...list, ...(cur && !list.includes(cur) ? [cur] : [])].map(v => `<option${v===cur?" selected":""}>${esc(v)}</option>`).join("");
+const pill = st => `<span class="pill st-${slug(st||"not contacted")}">${esc(st||"not contacted")}</span>`;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(()=> t.hidden = true, 2600); }
+function fail(e){ console.error(e); toast(e?.code === "quota_exceeded" ? "Storage is full. Delete old records to add more." : "Couldn't save. Check your connection and try again."); }
+
+// ---------- derived ----------
+function lastTouchMap(){ const m = {}; for (const t of S.touches) if (!m[t.gymId] || t.date > m[t.gymId]) m[t.gymId] = t.date; return m; }
+function evidenceRank(g){
+  let r = 0;
+  for (const t of S.touches) if (t.gymId === g.id) { r = Math.max(r, 1); if (t.type === "Reply received") r = Math.max(r, 2); }
+  for (const m of S.meetings) if (m.gymId === g.id) { r = Math.max(r, 3); if (m.proposalSent || num(m.proposalAmount) > 0) r = Math.max(r, 4); if (m.outcome === "won") r = 5; }
+  return r;
+}
+function reach(g){ return Math.max(g.reached || 0, RANK[g.status] ?? 0, evidenceRank(g)); }
+function isClient(g){ return g.status === "won" && g.client && g.client.active !== false; }
+function clients(){ return S.gyms.filter(g => g.status === "won" || g.client); }
+function mrr(){ return S.gyms.filter(isClient).reduce((s,g) => s + num(g.client.fee), 0); }
+function leakDefault(a){
+  if (!a || !a.date) return 0;
+  const missed = a.answered === "missed", fu = a.followUp === "yes";
+  if (missed && !fu) return 50;
+  let rt = parseFloat(a.responseMin); if (isNaN(rt)) rt = missed ? 60 : 0;
+  let p = rt <= 5 ? 10 : rt <= 15 ? 20 : rt <= 60 ? 30 : 40;
+  if (!fu) p += 10;
+  return p;
+}
+function auditLoss(a){
+  if (!a || !a.date) return 0;
+  if (a.lostOverride !== undefined && a.lostOverride !== "" && a.lostOverride !== null) return num(a.lostOverride);
+  const d = S.settings.audit;
+  const inq = a.inquiries !== "" && a.inquiries != null ? num(a.inquiries) : d.inquiries;
+  const leak = a.leakPct !== "" && a.leakPct != null ? num(a.leakPct) : leakDefault(a);
+  const close = a.closeRate !== "" && a.closeRate != null ? num(a.closeRate) : d.closeRate;
+  const dues = a.avgDues !== "" && a.avgDues != null ? num(a.avgDues) : d.avgDues;
+  const life = a.lifetimeMonths !== "" && a.lifetimeMonths != null ? num(a.lifetimeMonths) : d.lifetimeMonths;
+  return inq * leak/100 * close/100 * dues * life;
+}
+function weekActuals(ws){
+  const we = addDays(ws, 6), inW = d => d && d >= ws && d <= we;
+  const a = {calls:0, contacts:0, booked:0, audits:0, proposals:0};
+  for (const t of S.touches) if (inW(t.date)) { if (CALL_TYPES.has(t.type)) a.calls++; if (t.reached) a.contacts++; }
+  for (const m of S.meetings) { if (inW(m.bookedOn)) a.booked++; if (inW(m.proposalSent)) a.proposals++; }
+  for (const g of S.gyms) if (inW(g.audit?.date)) a.audits++;
+  return a;
+}
+function isCaseStudy(g){
+  if (g.client?.caseStudy) return true;
+  const fee = num(g.client?.fee); if (!fee) return false;
+  return S.results.some(r => r.gymId === g.id && num(r.revenue) >= fee * S.settings.caseStudyMultiple);
+}
+function filtered(){
+  const f = S.f, q = f.q.trim().toLowerCase();
+  return S.gyms.filter(g =>
+    (!f.city || (g.city||"") === f.city) && (!f.status || (g.status||"not contacted") === f.status) &&
+    (!f.source || g.source === f.source) && (!f.type || g.type === f.type) &&
+    (!q || [g.name,g.city,g.contact,g.email,g.phone,g.notes].join(" ").toLowerCase().includes(q))
+  ).sort((a,b) => (a.name||"").localeCompare(b.name||""));
+}
+function dueClass(d){ if (!d) return ""; const t = today(); return d < t ? "due-over" : d === t ? "due-today" : ""; }
+
+// ---------- auto-advance ----------
+function advance(g, to){
+  const cur = g.status || "not contacted";
+  if (to === "won" || to === "lost") { g.status = to; }
+  else if (cur === "won" || cur === "lost") { /* never move back automatically */ }
+  else if ((RANK[to] ?? 0) > (RANK[cur] ?? 0)) g.status = to;
+  g.reached = Math.max(g.reached || 0, RANK[g.status] ?? 0, to === "lost" ? 0 : (RANK[to] ?? 0));
+  return g;
+}
+
+// ---------- db writes ----------
+const strip = g => { const {id, ...b} = g; return clean(b); };
+async function putGym(g){ await db.collection("gyms").doc(g.id).set(strip(g)); }
+async function putDoc(col, o){ const {id, ...b} = o; await db.collection(col).doc(id).set(clean(b)); }
+const newId = col => db.collection(col).doc().id;
+function needDb(){ if (!db) { toast("Saving isn't available here. Open this page in claude.ai while signed in."); return false; } return true; }
+
+// ---------- rendering ----------
+let raf = 0;
+function schedule(){ if (!raf) raf = requestAnimationFrame(() => { raf = 0; render(); }); }
+function render(){
+  $("#tabs").innerHTML = VIEWS.map(([k,l]) => {
+    let c = "";
+    if (k === "prospects") c = S.gyms.length; else if (k === "clients") c = S.gyms.filter(isClient).length;
+    return `<button class="tab" data-act="go" data-v="${k}"${S.view===k?' aria-current="page"':""}>${l}${c!==""?`<span class="count">${c}</span>`:""}</button>`;
+  }).join("");
+  const v = $("#view"), a = document.activeElement, keep = a && v.contains(a) && a.id ? {id:a.id, s:a.selectionStart, e:a.selectionEnd} : null;
+  let html = statusBanner();
+  html += (RENDER[S.view] || RENDER.overview)();
+  v.innerHTML = html;
+  if (keep) { const n = document.getElementById(keep.id); if (n) { n.focus(); try { n.setSelectionRange(keep.s, keep.e); } catch {} } }
+}
+function statusBanner(){
+  if (S.dbState === "none") return `<div class="banner">Saving isn't available in this view. Open this page in claude.ai while signed in to see and save your pipeline.</div>`;
+  if (S.dbState === "revoked") return `<div class="banner">Access to the saved data ended. Reload the page to reconnect.</div>`;
+  if (S.slow && !S.confirmed) return `<div class="banner">Still connecting to your saved data. What you see may be out of date.</div>`;
+  return "";
+}
+function filterBar(){
+  const cities = [...new Set(S.gyms.map(g => g.city).filter(Boolean))].sort();
+  const f = S.f;
+  return `<div class="filters">
+    <input type="search" id="f-q" placeholder="Search name, contact, notes…" value="${esc(f.q)}" aria-label="Search">
+    <select id="f-city" aria-label="City">${opts(cities, f.city, "All cities")}</select>
+    <select id="f-status" aria-label="Status">${opts(STATUSES, f.status, "All statuses")}</select>
+    <select id="f-source" aria-label="Lead source">${opts(SOURCES, f.source, "All lead sources")}</select>
+    <select id="f-type" aria-label="Gym type">${opts(TYPES, f.type, "All gym types")}</select>
+    ${f.q||f.city||f.status||f.source||f.type ? `<button class="btn small ghost" data-act="clearFilters">Clear</button>` : ""}
+  </div>`;
+}
+
+const RENDER = {};
+
+RENDER.overview = () => {
+  const G = S.gyms, n = G.length;
+  const audited = G.filter(g => g.audit?.date).length;
+  const contacted = G.filter(g => reach(g) >= 1).length;
+  const replied = G.filter(g => reach(g) >= 2).length;
+  const booked = G.filter(g => reach(g) >= 3).length;
+  const propsOut = S.meetings.filter(m => (m.proposalSent || num(m.proposalAmount) > 0) && (m.outcome||"pending") === "pending").length;
+  const won = G.filter(isClient).length;
+  const ws = weekStart(today()), wa = weekActuals(ws), T = S.settings.targets;
+  const sumA = METRICS.reduce((s,[k]) => s + Math.min(wa[k], T[k]||0), 0), sumT = METRICS.reduce((s,[k]) => s + (+T[k]||0), 0);
+  const goal = S.settings.goalClients || 3;
+  const auditLossTotal = G.reduce((s,g) => s + auditLoss(g.audit), 0);
+
+  const kpis = [
+    ["Gyms audited", audited, n ? `of ${n} prospects` : "no prospects yet"],
+    ["Contacted", contacted, n ? pct(contacted,n)+" of list" : ""],
+    ["Reply rate", contacted ? pct(replied,contacted) : "–", `${replied} replied`],
+    ["Calls booked", booked, "gyms reached this stage"],
+    ["Proposals out", propsOut, "awaiting a decision"],
+    ["Clients won", won, `goal ${goal}`],
+    ["Monthly revenue", money(mrr()), "active client fees"],
+    ["This week", sumT ? pct(sumA,sumT) : "–", `${wa.calls}/${T.calls} calls · ${wa.contacts}/${T.contacts} contacts · ${wa.booked}/${T.booked} booked`]
+  ];
+
+  const plates = Array.from({length: goal}, (_, i) => {
+    const c = G.filter(isClient)[i];
+    return `<div class="plate${c?" on":""}"><span>${c ? esc(c.name) : "Client " + (i+1)}</span></div>`;
+  }).join("");
+
+  return `
+  ${n === 0 ? `<div class="panel"><div class="empty"><b>Load your 100 DFW gyms to get started</b><span>Import a CSV with columns like Name, City, Website, Phone, Owner, Email, Type, Size and Lead source. You can also add gyms one at a time.</span><div class="row"><button class="btn primary" data-act="importCsv">Import CSV</button><button class="btn" data-act="template">Download CSV template</button><button class="btn" data-act="newGym">Add a gym</button></div></div></div>` : ""}
+  <section class="goal" aria-label="Goal tracker">
+    <div class="goal-head"><div><div class="eyebrow">Goal: paying gym clients</div><b>${won} <span>of ${goal}</span></b></div>
+      <div class="muted">${won >= goal ? "Goal reached. Raise it under Weekly targets." : `${goal - won} to go · ${money(mrr())}/mo signed`}</div></div>
+    <div class="plates">${plates}</div>
+  </section>
+  <div class="kpis eight">${kpis.map(([l,v,s]) => `<div class="kpi"><span class="eyebrow">${l}</span><b>${v}</b><span class="sub">${esc(s)}</span></div>`).join("")}</div>
+  <div class="grid2">
+    <section class="panel"><div class="spread"><h2>Today's actions</h2><span class="muted">${fmtDY(today())}</span></div>${todayList()}</section>
+    <section class="panel"><div class="spread"><h2>Pipeline funnel</h2><span class="muted">furthest stage reached</span></div>${funnel()}</section>
+  </div>
+  <section class="panel"><div class="spread"><h2>Results by lead source</h2>${auditLossTotal ? `<span class="muted">Audits show ${money(auditLossTotal)}/mo of revenue leaking across ${audited} gyms</span>` : ""}</div>${sourceTable()}</section>`;
+};
+
+function todayList(){
+  const t = today(), items = [];
+  for (const g of S.gyms) if (g.dueDate && g.dueDate <= t && g.status !== "lost") items.push({g, d:g.dueDate, kind:"next"});
+  for (const m of S.meetings) if (m.date && m.date <= t && (m.state||"scheduled") === "scheduled") items.push({g:gymById(m.gymId), d:m.date, kind:"meeting", m});
+  items.sort((a,b) => a.d.localeCompare(b.d));
+  if (!items.length) return `<div class="empty"><b>Nothing overdue or due today</b><span>Set a next action and due date on a gym and it shows up here.</span></div>`;
+  return `<div class="actions">${items.map(({g,d,kind,m}) => {
+    const late = daysBetween(d, t);
+    const when = late > 0 ? `<span class="due-over">${late} day${late>1?"s":""} overdue</span>` : `<span class="due-today">Due today</span>`;
+    if (kind === "meeting") return `<div class="act"><div><div class="t">${esc(m.kind||"Meeting")} with ${esc(g?.name||"?")}</div><div class="d">${when} · ${fmtD(d)}${m.time?" "+esc(m.time):""} · mark held or no-show</div></div><button class="btn small" data-act="editMeeting" data-id="${m.id}">Update</button></div>`;
+    return `<div class="act"><div><div class="t">${esc(g.nextAction || "Follow up")} · ${esc(g.name)}</div><div class="d">${when} · ${pill(g.status)} ${g.phone?" · "+esc(g.phone):""}</div></div><div class="row"><button class="btn small" data-act="newTouch" data-gym="${g.id}">Log touch</button><button class="btn small ghost" data-act="openGym" data-id="${g.id}">Open</button></div></div>`;
+  }).join("")}</div>`;
+}
+function funnel(){
+  const G = S.gyms, n = G.length;
+  const steps = [["Prospects",n],["Contacted",G.filter(g=>reach(g)>=1).length],["Replied",G.filter(g=>reach(g)>=2).length],["Call booked",G.filter(g=>reach(g)>=3).length],["Proposal sent",G.filter(g=>reach(g)>=4).length],["Won",G.filter(g=>reach(g)>=5).length]];
+  const max = Math.max(1, n);
+  return `<div class="funnel">${steps.map(([l,c],i) => `<div class="f-step"><span>${l}</span><div class="f-bar" style="width:${Math.max(c/max*100, c?6:0.5)}%">${c||""}</div><span class="conv">${i? pct(c, steps[i-1][1]) + " of prev" : ""}</span></div>`).join("")}</div>`;
+}
+function sourceTable(){
+  const rows = SOURCES.map(s => {
+    const G = S.gyms.filter(g => g.source === s);
+    const c = G.filter(g=>reach(g)>=1).length, r = G.filter(g=>reach(g)>=2).length, b = G.filter(g=>reach(g)>=3).length, w = G.filter(isClient).length;
+    return {s, n:G.length, c, r, b, w, m: G.filter(isClient).reduce((x,g)=>x+num(g.client.fee),0)};
+  });
+  const un = S.gyms.filter(g => !SOURCES.includes(g.source)).length;
+  const max = Math.max(1, ...rows.map(r => r.n));
+  return `<div class="tablewrap"><table><thead><tr><th>Lead source</th><th class="num">Gyms</th><th class="num">Contacted</th><th class="num">Replied</th><th class="num">Reply rate</th><th class="num">Calls booked</th><th class="num">Won</th><th class="num">Monthly revenue</th><th class="cols-hide-sm" style="width:28%">Share of list</th></tr></thead><tbody>
+  ${rows.map(r => `<tr><td class="name">${r.s}</td><td class="num">${r.n}</td><td class="num">${r.c}</td><td class="num">${r.r}</td><td class="num">${pct(r.r,r.c)}</td><td class="num">${r.b}</td><td class="num">${r.w}</td><td class="num">${money(r.m)}</td><td class="cols-hide-sm"><div class="bar-track"><div class="bar-fill" style="width:${r.n/max*100}%"></div></div></td></tr>`).join("")}
+  ${un ? `<tr><td class="muted">No source set</td><td class="num">${un}</td><td colspan="7"></td></tr>` : ""}
+  </tbody></table></div>`;
+}
+
+RENDER.prospects = () => {
+  const list = filtered(), lt = lastTouchMap();
+  return `<div class="spread"><h2>Prospects <span class="muted" style="font-weight:500">${list.length} of ${S.gyms.length}</span></h2>
+    <div class="row"><button class="btn" data-act="importCsv">Import CSV</button><button class="btn" data-act="template">CSV template</button><button class="btn" data-act="exportCsv">Export CSV</button><button class="btn" data-act="exportJson">Backup (JSON)</button><button class="btn primary" data-act="newGym">+ Add gym</button></div></div>
+  ${filterBar()}
+  ${list.length ? `<div class="tablewrap"><table><thead><tr><th>Gym</th><th>City</th><th class="cols-hide-sm">Owner / contact</th><th class="cols-hide-sm">Phone</th><th class="cols-hide-sm">Type</th><th class="cols-hide-sm">Size</th><th>Source</th><th>Status</th><th class="cols-hide-sm">Last touch</th></tr></thead><tbody>
+  ${list.map(g => `<tr class="click" data-act="openGym" data-id="${g.id}"><td><div class="name">${esc(g.name)}</div>${g.website?`<div class="sm">${esc(g.website.replace(/^https?:\/\//,""))}</div>`:""}</td><td>${esc(g.city)}</td><td class="cols-hide-sm">${esc(g.contact)}${g.email?`<div class="sm">${esc(g.email)}</div>`:""}</td><td class="cols-hide-sm nowrap">${esc(g.phone)}</td><td class="cols-hide-sm">${esc(g.type)}</td><td class="cols-hide-sm">${esc(g.size)}</td><td>${esc(g.source)}</td><td>${pill(g.status)}</td><td class="cols-hide-sm nowrap">${fmtD(lt[g.id])}</td></tr>`).join("")}
+  </tbody></table></div>` : emptyList()}`;
+};
+function emptyList(){
+  return S.gyms.length ? `<div class="panel empty"><b>No gyms match these filters</b><button class="btn" data-act="clearFilters">Clear filters</button></div>`
+    : `<div class="panel empty"><b>No gyms yet</b><span>Import your list or add your first gym.</span><div class="row"><button class="btn primary" data-act="importCsv">Import CSV</button><button class="btn" data-act="newGym">Add a gym</button></div></div>`;
+}
+
+RENDER.audits = () => {
+  const list = S.gyms.filter(g => g.audit?.date).sort((a,b) => b.audit.date.localeCompare(a.audit.date));
+  const total = list.reduce((s,g)=>s+auditLoss(g.audit),0);
+  const missed = list.filter(g=>g.audit.answered==="missed").length;
+  const noFu = list.filter(g=>g.audit.followUp!=="yes").length;
+  const avg = list.length ? (list.reduce((s,g)=>s+num(g.audit.score),0)/list.length).toFixed(1) : "–";
+  return `<div class="spread"><h2>Phone audits</h2><button class="btn primary" data-act="pickGym" data-then="audit">+ Log phone audit</button></div>
+  <div class="kpis">
+    <div class="kpi"><span class="eyebrow">Audited</span><b>${list.length}</b><span class="sub">gyms called</span></div>
+    <div class="kpi"><span class="eyebrow">Missed calls</span><b>${pct(missed,list.length)}</b><span class="sub">${missed} not answered</span></div>
+    <div class="kpi"><span class="eyebrow">No follow-up</span><b>${pct(noFu,list.length)}</b><span class="sub">${noFu} never followed up</span></div>
+    <div class="kpi"><span class="eyebrow">Avg score</span><b>${avg}</b><span class="sub">out of 10</span></div>
+    <div class="kpi"><span class="eyebrow">Est. revenue leaking</span><b>${money(total)}</b><span class="sub">per month, all audited gyms</span></div>
+  </div>
+  ${list.length ? `<div class="tablewrap"><table><thead><tr><th>Gym</th><th>Date called</th><th>Result</th><th class="num">Response</th><th>Follow-up</th><th class="num">Score</th><th class="num">Est. lost / mo</th><th class="cols-hide-sm">Notes</th></tr></thead><tbody>
+  ${list.map(g => { const a = g.audit; return `<tr class="click" data-act="openGym" data-id="${g.id}" data-sec="audit"><td><div class="name">${esc(g.name)}</div><div class="sm">${esc(g.city)}</div></td><td class="nowrap">${fmtD(a.date)}</td><td>${a.answered==="missed"?'<span class="pill st-lost">missed</span>':'<span class="pill st-won">answered</span>'}</td><td class="num nowrap">${a.responseMin!==""&&a.responseMin!=null?esc(a.responseMin)+" min":"–"}</td><td>${a.followUp==="yes"?"Yes":"No"}</td><td class="num">${esc(a.score||"–")}</td><td class="num">${money(auditLoss(a))}</td><td class="cols-hide-sm">${esc(a.notes)}</td></tr>`; }).join("")}
+  </tbody></table></div>` : `<div class="panel empty"><b>No phone audits yet</b><span>Mystery-call a gym, then log whether they answered, how fast they followed up, and a score out of 10. The calculator estimates what that costs them each month.</span><button class="btn primary" data-act="pickGym" data-then="audit">Log your first audit</button></div>`}`;
+};
+
+RENDER.outreach = () => {
+  const list = filtered(), lt = lastTouchMap();
+  const counts = STATUSES.map(s => [s, S.gyms.filter(g => (g.status||"not contacted") === s).length]);
+  const recent = [...S.touches].sort((a,b) => (b.date+b.created).localeCompare(a.date+a.created)).slice(0, 12);
+  return `<div class="spread"><h2>Outreach</h2><button class="btn primary" data-act="newTouch">+ Log touch</button></div>
+  <div class="row">${counts.map(([s,c]) => `<button class="btn small${S.f.status===s?" primary":""}" data-act="statusFilter" data-s="${s}">${s} · ${c}</button>`).join("")}</div>
+  ${filterBar()}
+  ${list.length ? `<div class="tablewrap"><table><thead><tr><th>Gym</th><th>Status</th><th>Last touch</th><th>Next action</th><th>Due</th><th></th></tr></thead><tbody>
+  ${list.map(g => `<tr><td><button class="btn ghost small" style="padding-left:0" data-act="openGym" data-id="${g.id}"><span class="name">${esc(g.name)}</span></button><div class="sm">${esc(g.city)} · ${esc(g.source||"no source")}</div></td>
+    <td><select data-change="status" data-id="${g.id}" aria-label="Status for ${esc(g.name)}">${opts(STATUSES, g.status||"not contacted")}</select></td>
+    <td class="nowrap">${fmtD(lt[g.id]) || '<span class="muted">never</span>'}</td><td>${esc(g.nextAction)}</td><td class="nowrap ${dueClass(g.dueDate)}">${fmtD(g.dueDate)}</td>
+    <td><button class="btn small" data-act="newTouch" data-gym="${g.id}">Log touch</button></td></tr>`).join("")}
+  </tbody></table></div>` : emptyList()}
+  <section class="panel"><h2>Recent touches</h2>${recent.length ? `<div class="mini">${recent.map(t => `<div class="mini-item"><span class="muted nowrap">${fmtD(t.date)}</span><span><b>${esc(gymName(t.gymId))}</b> · ${esc(t.type)}${t.reached?' · <span class="pill st-won">reached DM</span>':""}${t.note?`<br><span class="muted">${esc(t.note)}</span>`:""}</span><button class="btn small ghost danger" data-act="delTouch" data-id="${t.id}" aria-label="Delete touch">Delete</button></div>`).join("")}</div>` : `<p class="muted">No touches logged yet. Each call, email, DM or walk-in you log counts toward your weekly targets.</p>`}</section>`;
+};
+
+RENDER.calls = () => {
+  const list = [...S.meetings].sort((a,b) => (b.date||"").localeCompare(a.date||""));
+  const out = list.filter(m => (m.proposalSent || num(m.proposalAmount)>0) && (m.outcome||"pending")==="pending");
+  const wonAmt = list.filter(m => m.outcome==="won").reduce((s,m)=>s+num(m.proposalAmount),0);
+  const upcoming = list.filter(m => m.date >= today() && (m.state||"scheduled")==="scheduled").length;
+  return `<div class="spread"><h2>Calls &amp; proposals</h2><button class="btn primary" data-act="newMeeting">+ Add call / proposal</button></div>
+  <div class="kpis">
+    <div class="kpi"><span class="eyebrow">Upcoming calls</span><b>${upcoming}</b><span class="sub">scheduled</span></div>
+    <div class="kpi"><span class="eyebrow">Proposals out</span><b>${out.length}</b><span class="sub">${money(out.reduce((s,m)=>s+num(m.proposalAmount),0))}/mo pending</span></div>
+    <div class="kpi"><span class="eyebrow">Won</span><b>${list.filter(m=>m.outcome==="won").length}</b><span class="sub">${money(wonAmt)}/mo</span></div>
+    <div class="kpi"><span class="eyebrow">Close rate</span><b>${pct(list.filter(m=>m.outcome==="won").length, list.filter(m=>["won","lost"].includes(m.outcome)).length)}</b><span class="sub">won ÷ decided</span></div>
+  </div>
+  ${list.length ? `<div class="tablewrap"><table><thead><tr><th>Date</th><th>Gym</th><th>Type</th><th>Call</th><th class="num">Proposal / mo</th><th class="cols-hide-sm">Sent</th><th>Outcome</th><th class="cols-hide-sm">Notes</th></tr></thead><tbody>
+  ${list.map(m => `<tr class="click" data-act="editMeeting" data-id="${m.id}"><td class="nowrap">${fmtD(m.date)}${m.time?`<div class="sm">${esc(m.time)}</div>`:""}</td><td class="name">${esc(gymName(m.gymId))}</td><td>${esc(m.kind)}</td><td>${esc(m.state||"scheduled")}</td><td class="num">${num(m.proposalAmount)?money(m.proposalAmount):"–"}</td><td class="cols-hide-sm nowrap">${fmtD(m.proposalSent)}</td><td>${outcomePill(m.outcome)}</td><td class="cols-hide-sm">${esc(m.notes)}</td></tr>`).join("")}
+  </tbody></table></div>` : `<div class="panel empty"><b>No calls or proposals yet</b><span>Log a booked call here. It moves the gym to "call booked" and counts toward this week's target.</span><button class="btn primary" data-act="newMeeting">Add a call</button></div>`}`;
+};
+function outcomePill(o){ o = o || "pending"; const cls = {won:"st-won",lost:"st-lost",stalled:"st-call-booked",pending:""}[o]; return `<span class="pill ${cls}">${o}</span>`; }
+
+RENDER.objections = () => {
+  const list = S.gyms.filter(g => g.objection?.category);
+  const counts = OBJECTIONS.map(o => [o, list.filter(g => g.objection.category === o).length]).filter(x => x[1]).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(1, ...counts.map(c=>c[1]));
+  const missing = S.gyms.filter(g => g.status === "lost" && !g.objection?.category);
+  return `<div class="spread"><h2>Objections</h2><button class="btn primary" data-act="pickGym" data-then="objection">+ Log objection</button></div>
+  ${missing.length ? `<div class="banner">${missing.length} lost gym${missing.length>1?"s have":" has"} no objection logged: ${missing.map(g=>`<button class="btn small ghost" data-act="openGym" data-id="${g.id}" data-sec="objection">${esc(g.name)}</button>`).join(" ")}</div>` : ""}
+  <section class="panel"><div class="spread"><h2>Most common reasons</h2><span class="muted">${list.length} gyms logged</span></div>
+  ${counts.length ? `<div class="bars">${counts.map(([o,c]) => `<div class="bar-row"><span class="lab">${esc(o)}</span><div class="bar-track"><div class="bar-fill plate" style="width:${c/max*100}%"></div></div><span class="val">${c} · ${pct(c,list.length)}</span></div>`).join("")}</div>` : `<p class="muted">No objections logged yet. When a gym goes lost or stalls, record the reason they gave.</p>`}</section>
+  ${list.length ? `<div class="tablewrap"><table><thead><tr><th>Gym</th><th>Status</th><th>Objection</th><th>What they said</th><th class="cols-hide-sm">Logged</th></tr></thead><tbody>
+  ${list.sort((a,b)=>(b.objection.date||"").localeCompare(a.objection.date||"")).map(g => `<tr class="click" data-act="openGym" data-id="${g.id}" data-sec="objection"><td class="name">${esc(g.name)}</td><td>${pill(g.status)}</td><td>${esc(g.objection.category)}</td><td>${esc(g.objection.detail)}</td><td class="cols-hide-sm nowrap">${fmtD(g.objection.date)}</td></tr>`).join("")}
+  </tbody></table></div>` : ""}`;
+};
+
+RENDER.clients = () => {
+  const list = clients();
+  return `<div class="spread"><h2>Clients &amp; revenue</h2><span class="muted">Mark a gym "won" to add it here</span></div>
+  <div class="kpis">
+    <div class="kpi"><span class="eyebrow">Paying clients</span><b>${S.gyms.filter(isClient).length}</b><span class="sub">goal ${S.settings.goalClients}</span></div>
+    <div class="kpi"><span class="eyebrow">Monthly revenue</span><b>${money(mrr())}</b><span class="sub">active fees</span></div>
+    <div class="kpi"><span class="eyebrow">Annual run rate</span><b>${money(mrr()*12)}</b><span class="sub">MRR × 12</span></div>
+  </div>
+  ${list.length ? `<div class="tablewrap"><table><thead><tr><th>Gym</th><th>City</th><th class="num">Monthly fee</th><th>Start date</th><th class="num">Months live</th><th>Status</th><th>Case study</th></tr></thead><tbody>
+  ${list.map(g => { const c = g.client||{}; const mo = c.startDate ? Math.max(0, Math.floor(daysBetween(c.startDate, today())/30.4)) : "–"; return `<tr class="click" data-act="openGym" data-id="${g.id}" data-sec="client"><td class="name">${esc(g.name)}</td><td>${esc(g.city)}</td><td class="num">${money(c.fee)}</td><td class="nowrap">${fmtDY(c.startDate)}</td><td class="num">${mo}</td><td>${isClient(g)?'<span class="pill st-won">active</span>':'<span class="pill st-lost">inactive</span>'}</td><td>${isCaseStudy(g)?'<span class="flag">★ Case study</span>':""}</td></tr>`; }).join("")}
+  <tr><td colspan="2"><b>Total monthly revenue</b></td><td class="num"><b>${money(mrr())}</b></td><td colspan="4"></td></tr>
+  </tbody></table></div>` : `<div class="panel empty"><b>No clients yet</b><span>When a proposal is won, the gym lands here with its monthly fee and start date.</span></div>`}`;
+};
+
+RENDER.results = () => {
+  const list = clients();
+  if (!list.length) return `<h2>Client results</h2><div class="panel empty"><b>Results appear once you sign a client</b><span>Each month, log leads recovered, members reactivated and revenue recovered for every client.</span></div>`;
+  const mult = S.settings.caseStudyMultiple;
+  return `<div class="spread"><h2>Client results</h2><button class="btn primary" data-act="newResult">+ Log month</button></div>
+  <p class="muted" style="margin:0">A client is flagged as case-study material when a month's recovered revenue is ${mult}× or more their monthly fee, or when you star them.</p>
+  <div class="grid2">${list.map(g => {
+    const R = S.results.filter(r => r.gymId === g.id).sort((a,b) => a.month.localeCompare(b.month));
+    const fee = num(g.client?.fee), tot = k => R.reduce((s,r)=>s+num(r[k]),0);
+    const maxR = Math.max(1, ...R.map(r=>num(r.revenue)));
+    return `<section class="panel client-card"><div class="spread"><div><h2>${esc(g.name)}</h2><span class="muted">${money(fee)}/mo fee · ${R.length} month${R.length===1?"":"s"} tracked</span></div>${isCaseStudy(g)?'<span class="flag">★ Case study</span>':""}</div>
+      <div class="kpis"><div class="kpi"><span class="eyebrow">Leads recovered</span><b>${tot("leads")}</b></div><div class="kpi"><span class="eyebrow">Reactivated</span><b>${tot("reactivated")}</b></div><div class="kpi"><span class="eyebrow">Revenue recovered</span><b>${money(tot("revenue"))}</b><span class="sub">${fee?(tot("revenue")/Math.max(1,fee*R.length)).toFixed(1)+"× fees paid":""}</span></div></div>
+      ${R.length ? `<div class="month-bars" aria-label="Revenue recovered by month">${R.map(r => `<div class="${fee && num(r.revenue)>=fee*mult?"cs":""}" style="height:${num(r.revenue)/maxR*100}%" title="${fmtMonth(r.month)}: ${money(r.revenue)}"></div>`).join("")}</div>
+      <div class="tablewrap"><table><thead><tr><th>Month</th><th class="num">Leads</th><th class="num">Reactivated</th><th class="num">Revenue</th><th class="num">ROI</th></tr></thead><tbody>${[...R].reverse().map(r => `<tr class="click" data-act="editResult" data-id="${r.id}"><td class="nowrap">${fmtMonth(r.month)}</td><td class="num">${num(r.leads)}</td><td class="num">${num(r.reactivated)}</td><td class="num">${money(r.revenue)}</td><td class="num">${fee?(num(r.revenue)/fee).toFixed(1)+"×":"–"}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">No months logged yet.</p>`}
+      <div class="row"><button class="btn small" data-act="newResult" data-gym="${g.id}">Log a month</button><button class="btn small ghost" data-act="toggleStar" data-id="${g.id}">${g.client?.caseStudy?"★ Unstar":"☆ Star as case study"}</button></div>
+    </section>`;
+  }).join("")}</div>`;
+};
+
+RENDER.weekly = () => {
+  const T = S.settings.targets, cur = weekStart(today());
+  const weeks = Array.from({length: 8}, (_, i) => addDays(cur, -7*i));
+  const wa = weekActuals(cur);
+  return `<div class="spread"><h2>Weekly activity targets</h2><span class="muted">Week of ${fmtD(cur)} · Monday to Sunday</span></div>
+  <section class="panel"><h2>This week vs target</h2><div class="bars">${METRICS.map(([k,l]) => { const t = +T[k]||0, a = wa[k], scale = Math.max(t, a, 1); return `<div class="bar-row"><span class="lab">${l}</span><div class="bar-track"><div class="bar-fill${a>=t&&t?"":" plate"}" style="width:${a/scale*100}%"></div>${t?`<div class="bar-target" style="left:calc(${t/scale*100}% - 1px)"></div>`:""}</div><span class="val">${a} / ${t}</span></div>`; }).join("")}</div>
+  <div class="legend" style="margin-top:10px"><span><i style="background:var(--accent)"></i>target hit</span><span><i style="background:var(--plate)"></i>below target</span><span><i style="background:var(--ink);width:2px"></i>target</span></div></section>
+  <section class="panel"><h2>Last 8 weeks</h2><div class="tablewrap"><table><thead><tr><th>Week of</th>${METRICS.map(([,l])=>`<th class="num">${l}</th>`).join("")}</tr></thead><tbody>
+  ${weeks.map(w => { const a = weekActuals(w); return `<tr><td class="nowrap">${fmtD(w)}${w===cur?' <span class="pill st-won">now</span>':""}</td>${METRICS.map(([k]) => { const t = +T[k]||0; return `<td class="num ${t && a[k]>=t ? "" : t ? "due-over" : ""}">${a[k]} / ${t}</td>`; }).join("")}</tr>`; }).join("")}
+  </tbody></table></div><p class="muted" style="margin:8px 0 0;font-size:12px">Counted from what you log. Calls are phone dials (audit, cold and follow-up calls). Contacts are touches where you reached the owner or decision maker. Calls booked are counted on the day you booked them.</p></section>
+  <section class="panel"><h2>Targets &amp; defaults</h2><form id="targets-form" class="form">
+    ${METRICS.map(([k,l]) => `<label class="field"><span>${l} per week</span><input type="number" min="0" id="t-${k}" value="${esc(T[k])}"></label>`).join("")}
+    <label class="field"><span>Paying client goal</span><input type="number" min="1" id="t-goal" value="${esc(S.settings.goalClients)}"></label>
+    <label class="field"><span>Case study at (× fee)</span><input type="number" min="1" step="0.5" id="t-cs" value="${esc(S.settings.caseStudyMultiple)}"></label>
+    <label class="field"><span>Audit default: monthly inquiries</span><input type="number" min="0" id="t-inq" value="${esc(S.settings.audit.inquiries)}"></label>
+    <label class="field"><span>Audit default: close rate %</span><input type="number" min="0" max="100" id="t-close" value="${esc(S.settings.audit.closeRate)}"></label>
+    <label class="field"><span>Audit default: avg dues $/mo</span><input type="number" min="0" id="t-dues" value="${esc(S.settings.audit.avgDues)}"></label>
+    <label class="field"><span>Audit default: member value (months)</span><input type="number" min="1" id="t-life" value="${esc(S.settings.audit.lifetimeMonths)}"></label>
+    <div class="field wide"><button class="btn primary" type="submit" style="justify-self:start">Save targets</button></div>
+  </form></section>`;
+};
+
+// ---------- dialogs ----------
+const dlg = $("#dlg");
+function openDlg(html){ $("#dlg-inner").innerHTML = html; if (!dlg.open) dlg.showModal(); const b = $(".dlg-body", dlg); if (b) b.scrollTop = 0; }
+function closeDlg(){ if (dlg.open) dlg.close(); }
+dlg.addEventListener("click", e => { if (e.target === dlg) closeDlg(); });
+const head = (t, extra="") => `<div class="dlg-head"><h2>${t}</h2><div class="row">${extra}<button class="btn small ghost" data-act="close" aria-label="Close">✕</button></div></div>`;
+const fld = (label, inner, cls="") => `<label class="field ${cls}"><span>${label}</span>${inner}</label>`;
+const inp = (id, v, type="text", attrs="") => `<input id="${id}" type="${type}" value="${esc(v ?? "")}" ${attrs}>`;
+const val = id => { const e = document.getElementById(id); return e ? (e.type === "checkbox" ? e.checked : e.value.trim()) : undefined; };
+const gymSelect = (id, cur, list = S.gyms) => `<select id="${id}" required>${cur?"":'<option value="">Choose a gym…</option>'}${[...list].sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(g => `<option value="${g.id}"${g.id===cur?" selected":""}>${esc(g.name)}${g.city?" · "+esc(g.city):""}</option>`).join("")}</select>`;
+
+let editing = null; // gym being edited
+function openGym(id, sec){
+  const g = id ? clean(gymById(id) || {}) : {status:"not contacted"};
+  if (id && !gymById(id)) return;
+  g.id = id || null; editing = g;
+  const a = g.audit || {}, o = g.objection || {}, c = g.client || {}, d = S.settings.audit;
+  const T = S.touches.filter(t => t.gymId === id).sort((x,y) => y.date.localeCompare(x.date));
+  const M = S.meetings.filter(m => m.gymId === id).sort((x,y) => (y.date||"").localeCompare(x.date||""));
+  openDlg(`${head(id ? esc(g.name) : "Add gym", id ? pill(g.status) : "")}
+  <form class="dlg-body" id="gym-form">
+    <fieldset id="sec-details"><div class="form">
+      ${fld("Gym name *", inp("g-name", g.name, "text", "required"))}
+      ${fld("City", inp("g-city", g.city, "text", 'list="cities"'))}
+      ${fld("Website", inp("g-website", g.website))}
+      ${fld("Phone", inp("g-phone", g.phone, "tel"))}
+      ${fld("Owner / contact", inp("g-contact", g.contact))}
+      ${fld("Email", inp("g-email", g.email, "email"))}
+      ${fld("Gym type", `<select id="g-type">${opts(TYPES, g.type, "—")}</select>`)}
+      ${fld("Size", `<select id="g-size">${opts(SIZES, g.size, "—")}</select>`)}
+      ${fld("Lead source", `<select id="g-source">${opts(SOURCES, g.source, "—")}</select>`)}
+      ${fld("Notes", `<textarea id="g-notes">${esc(g.notes)}</textarea>`, "wide")}
+    </div><datalist id="cities">${[...new Set(["Dallas","Fort Worth","Arlington","Plano","Frisco","Irving","Garland","McKinney","Denton","Grand Prairie","Carrollton","Richardson","Lewisville","Allen","Southlake","Grapevine","Mansfield","Keller", ...S.gyms.map(x=>x.city).filter(Boolean)])].map(x=>`<option value="${esc(x)}">`).join("")}</datalist></fieldset>
+
+    <div class="section" id="sec-outreach"><h3>Outreach</h3><div class="form">
+      ${fld("Status", `<select id="g-status">${opts(STATUSES, g.status||"not contacted")}</select>`)}
+      ${fld("Next action", inp("g-next", g.nextAction, "text", 'placeholder="e.g. Call owner re: audit results"'))}
+      ${fld("Due date", inp("g-due", g.dueDate, "date"))}
+    </div>
+    ${id ? `<div class="calc"><div class="eyebrow">Log a touch</div><div class="form">
+      ${fld("Date", inp("t-date", today(), "date"))}
+      ${fld("Type", `<select id="t-type">${opts(TOUCH_TYPES, "Cold call")}</select>`)}
+      ${fld("Note", inp("t-note", ""))}
+      <label class="check" style="align-self:end"><input type="checkbox" id="t-reached"> Reached decision maker</label>
+    </div><button class="btn small" type="button" data-act="addTouchInline" style="justify-self:start">Add touch</button></div>
+    <div class="mini">${T.length ? T.map(t => `<div class="mini-item"><span class="muted nowrap">${fmtD(t.date)}</span><span>${esc(t.type)}${t.reached?" · reached DM":""}${t.note?` · <span class="muted">${esc(t.note)}</span>`:""}</span><button type="button" class="btn small ghost danger" data-act="delTouch" data-id="${t.id}">Delete</button></div>`).join("") : '<span class="muted">No touches yet.</span>'}</div>` : ""}
+    </div>
+
+    <div class="section" id="sec-audit"><h3>Phone audit</h3><div class="form">
+      ${fld("Date called", inp("a-date", a.date, "date"))}
+      ${fld("Answered or missed", `<select id="a-answered">${opts(["answered","missed"], a.answered, "—")}</select>`)}
+      ${fld("Response time (minutes)", inp("a-resp", a.responseMin, "number", 'min="0" placeholder="until a human answered or called back"'))}
+      ${fld("Follow-up received", `<select id="a-fu">${opts(["yes","no"], a.followUp, "—")}</select>`)}
+      ${fld("Score (1–10)", inp("a-score", a.score, "number", 'min="1" max="10"'))}
+      ${fld("Notes", `<textarea id="a-notes">${esc(a.notes)}</textarea>`, "wide")}
+    </div>
+    <div class="calc"><div class="spread"><span class="eyebrow">Revenue lost calculator</span><span class="muted" style="font-size:12px">blank fields use the defaults shown</span></div>
+      <div class="form">
+        ${fld("Monthly inquiries", inp("a-inq", a.inquiries, "number", `min="0" placeholder="${d.inquiries}"`))}
+        ${fld("% leaked (missed / slow)", inp("a-leak", a.leakPct, "number", `min="0" max="100" placeholder="${leakDefault({...a, date:"x"})} suggested"`))}
+        ${fld("Close rate %", inp("a-close", a.closeRate, "number", `min="0" max="100" placeholder="${d.closeRate}"`))}
+        ${fld("Avg dues $/mo", inp("a-dues", a.avgDues, "number", `min="0" placeholder="${d.avgDues}"`))}
+        ${fld("Member value (months)", inp("a-life", a.lifetimeMonths, "number", `min="1" placeholder="${d.lifetimeMonths}"`))}
+        ${fld("Override $/mo", inp("a-over", a.lostOverride, "number", 'min="0" placeholder="optional"'))}
+      </div>
+      <div><span class="eyebrow">Est. monthly revenue lost</span><div class="out" id="a-out">–</div><span class="muted" style="font-size:12px" id="a-explain"></span></div>
+    </div></div>
+
+    <div class="section" id="sec-meetings"><div class="spread"><h3>Calls &amp; proposals</h3>${id?`<button type="button" class="btn small" data-act="newMeeting" data-gym="${id}">+ Add call / proposal</button>`:""}</div>
+      ${id ? (M.length ? `<div class="mini">${M.map(m => `<div class="mini-item"><span class="muted nowrap">${fmtD(m.date)}</span><span>${esc(m.kind)} · ${esc(m.state||"scheduled")}${num(m.proposalAmount)?` · proposal ${money(m.proposalAmount)}/mo`:""} · ${outcomePill(m.outcome)}</span><button type="button" class="btn small ghost" data-act="editMeeting" data-id="${m.id}">Edit</button></div>`).join("")}</div>` : '<span class="muted">No calls booked yet.</span>') : '<span class="muted">Save the gym first to add calls.</span>'}
+    </div>
+
+    <div class="section" id="sec-objection"><h3>Objection <span class="muted" style="font-weight:500;font-size:12px">for lost or stalled gyms</span></h3><div class="form">
+      ${fld("Reason", `<select id="o-cat">${opts(OBJECTIONS, o.category, "—")}</select>`)}
+      ${fld("What they said", inp("o-detail", o.detail), "wide")}
+    </div><span class="muted" id="o-warn" style="font-size:12px"></span></div>
+
+    <div class="section" id="sec-client"><h3>Client</h3>
+      <div class="form">
+        ${fld("Monthly fee ($)", inp("c-fee", c.fee, "number", 'min="0"'))}
+        ${fld("Start date", inp("c-start", c.startDate, "date"))}
+        <label class="check" style="align-self:end"><input type="checkbox" id="c-active"${c.active!==false?" checked":""}> Active (paying)</label>
+        <label class="check" style="align-self:end"><input type="checkbox" id="c-cs"${c.caseStudy?" checked":""}> ★ Case study material</label>
+      </div><span class="muted" style="font-size:12px">Counts as a paying client when the status is "won" and Active is checked.</span>
+    </div>
+  </form>
+  <div class="dlg-foot">${id?`<button class="btn danger" data-act="delGym" data-id="${id}" style="margin-right:auto">Delete gym</button>`:""}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveGym">${id?"Save changes":"Add gym"}</button></div>`);
+  updateCalc(); updateObjWarn();
+  if (sec) { const s = document.getElementById("sec-"+sec); if (s) { s.scrollIntoView({block:"start"}); s.classList.add("hl"); } }
+  else if (!id) $("#g-name").focus();
+}
+function auditFromForm(){
+  return {date:val("a-date"), answered:val("a-answered"), responseMin:val("a-resp"), followUp:val("a-fu"), score:val("a-score"), notes:val("a-notes"),
+    inquiries:val("a-inq"), leakPct:val("a-leak"), closeRate:val("a-close"), avgDues:val("a-dues"), lifetimeMonths:val("a-life"), lostOverride:val("a-over")};
+}
+function updateCalc(){
+  const out = $("#a-out"); if (!out) return;
+  const a = auditFromForm(), d = S.settings.audit;
+  const probe = {...a, date: a.date || "x"};
+  $("#a-leak").placeholder = leakDefault(probe) + " suggested";
+  const v = auditLoss(probe);
+  out.textContent = money(v) + " / mo";
+  const inq = a.inquiries || d.inquiries, leak = a.leakPct || leakDefault(probe), close = a.closeRate || d.closeRate, dues = a.avgDues || d.avgDues, life = a.lifetimeMonths || d.lifetimeMonths;
+  $("#a-explain").textContent = a.lostOverride ? "Using your override." : `${inq} inquiries × ${leak}% leaked × ${close}% close = ${(inq*leak/100*close/100).toFixed(1)} members lost each month × $${dues}/mo × ${life} months`;
+}
+function updateObjWarn(){
+  const w = $("#o-warn"); if (!w) return;
+  w.textContent = val("g-status") === "lost" && !val("o-cat") ? "This gym is marked lost. Pick the reason they gave so it shows up in your objections chart." : "";
+  w.style.color = w.textContent ? "var(--bad)" : "";
+}
+dlg.addEventListener("input", e => { if (e.target.id?.startsWith("a-")) updateCalc(); if (e.target.id === "g-status" || e.target.id === "o-cat") updateObjWarn(); });
+dlg.addEventListener("change", e => { if (e.target.id?.startsWith("a-")) updateCalc(); if (e.target.id === "g-status" || e.target.id === "o-cat") updateObjWarn(); });
+
+async function saveGym(keepOpen){
+  if (!needDb()) return;
+  const name = val("g-name"); if (!name) { $("#g-name").focus(); toast("Give the gym a name."); return; }
+  const prev = editing.id ? gymById(editing.id) : null;
+  const g = editing.id ? clean(prev) : {created: new Date().toISOString(), reached: 0};
+  g.id = editing.id || newId("gyms");
+  Object.assign(g, {name, city:val("g-city"), website:val("g-website"), phone:val("g-phone"), contact:val("g-contact"), email:val("g-email"),
+    type:val("g-type"), size:val("g-size"), source:val("g-source"), notes:val("g-notes"), status:val("g-status"), nextAction:val("g-next"), dueDate:val("g-due")});
+  const a = auditFromForm();
+  const hasAudit = Object.entries(a).some(([k,v]) => v);
+  g.audit = hasAudit ? a : null;
+  const oc = val("o-cat"), od = val("o-detail");
+  g.objection = oc || od ? {category: oc || "Other", detail: od, date: g.objection?.date || today()} : null;
+  const fee = val("c-fee"), start = val("c-start");
+  if (g.status === "won" || fee || start || g.client) {
+    g.client = {fee: num(fee) || num(latestProposal(g.id)), startDate: start || g.client?.startDate || today(), active: val("c-active"), caseStudy: val("c-cs")};
+  }
+  // reached: manual moves set the floor; lost keeps history
+  g.reached = g.status === "lost" ? Math.max(prev?.reached || 0, evidenceRank(g)) : Math.max(RANK[g.status] ?? 0, evidenceRank(g));
+  try {
+    // a newly logged audit counts as a dial for the weekly target
+    const auditTouch = a.date && !S.touches.some(t => t.gymId === g.id && t.type === "Phone audit call");
+    await putGym(g);
+    if (auditTouch) await putDoc("touches", {id:newId("touches"), gymId:g.id, date:a.date, type:"Phone audit call", reached:false, note:"Mystery-shop audit call", created:new Date().toISOString()});
+    if (!keepOpen) { closeDlg(); toast(prev ? "Saved" : "Gym added"); }
+    return true;
+  } catch(e){ fail(e); return false; }
+}
+function latestProposal(gymId){
+  const m = S.meetings.filter(x => x.gymId === gymId && num(x.proposalAmount)).sort((a,b)=>(b.date||"").localeCompare(a.date||""))[0];
+  return m ? m.proposalAmount : 0;
+}
+
+async function addTouchInline(){
+  if (!needDb() || !editing?.id) return;
+  const t = {id:newId("touches"), gymId:editing.id, date:val("t-date")||today(), type:val("t-type"), reached:val("t-reached"), note:val("t-note"), created:new Date().toISOString()};
+  try {
+    await putDoc("touches", t);
+    const g = clean(gymById(editing.id)); advance(g, t.type === "Reply received" ? "replied" : "contacted");
+    await putGym(g);
+    toast("Touch logged");
+    const sel = $("#g-status"); if (sel && (RANK[g.status] ?? -1) > (RANK[sel.value] ?? 99)) sel.value = g.status;
+    const list = $("#sec-outreach .mini");
+    if (list) { if (!list.querySelector(".mini-item")) list.innerHTML = "";
+      list.insertAdjacentHTML("afterbegin", `<div class="mini-item"><span class="muted nowrap">${fmtD(t.date)}</span><span>${esc(t.type)}${t.reached?" · reached DM":""}${t.note?` · <span class="muted">${esc(t.note)}</span>`:""}</span><button type="button" class="btn small ghost danger" data-act="delTouch" data-id="${t.id}">Delete</button></div>`); }
+    $("#t-note").value = ""; $("#t-reached").checked = false;
+  } catch(e){ fail(e); }
+}
+
+function openTouch(gymId){
+  const g = gymId ? gymById(gymId) : null;
+  if (!S.gyms.length) { toast("Add or import a gym first."); return; }
+  openDlg(`${head("Log a touch")}
+  <form class="dlg-body" id="touch-form"><div class="form">
+    ${fld("Gym", gymSelect("tt-gym", gymId), "wide")}
+    ${fld("Date", inp("tt-date", today(), "date"))}
+    ${fld("Type", `<select id="tt-type">${opts(TOUCH_TYPES, "Cold call")}</select>`)}
+    <label class="check" style="align-self:end"><input type="checkbox" id="tt-reached"> Reached decision maker</label>
+    ${fld("Note", inp("tt-note", ""), "wide")}
+  </div>
+  <div class="calc"><span class="eyebrow">Then what?</span><div class="form">
+    ${fld("Next action", inp("tt-next", g?.nextAction || "", "text", 'placeholder="e.g. Send audit recording"'))}
+    ${fld("Due date", inp("tt-due", g?.dueDate && g.dueDate > today() ? g.dueDate : addDays(today(), 3), "date"))}
+  </div></div></form>
+  <div class="dlg-foot"><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveTouch">Log touch</button></div>`);
+  $("#tt-gym").addEventListener("change", e => { const x = gymById(e.target.value); if (x) $("#tt-next").value = x.nextAction || ""; });
+}
+async function saveTouch(){
+  if (!needDb()) return;
+  const gymId = val("tt-gym"); if (!gymId) { toast("Choose a gym."); return; }
+  const t = {id:newId("touches"), gymId, date:val("tt-date")||today(), type:val("tt-type"), reached:val("tt-reached"), note:val("tt-note"), created:new Date().toISOString()};
+  try {
+    await putDoc("touches", t);
+    const g = clean(gymById(gymId)); advance(g, t.type === "Reply received" ? "replied" : "contacted");
+    g.nextAction = val("tt-next"); g.dueDate = val("tt-due");
+    await putGym(g);
+    closeDlg(); toast("Touch logged");
+  } catch(e){ fail(e); }
+}
+
+let editingMeeting = null;
+function openMeeting(id, gymId){
+  if (!S.gyms.length) { toast("Add or import a gym first."); return; }
+  const m = id ? clean(S.meetings.find(x => x.id === id) || {}) : {gymId, kind:"Discovery call", state:"scheduled", outcome:"pending", bookedOn: today(), date: addDays(today(), 2)};
+  m.id = id || null; editingMeeting = m;
+  openDlg(`${head(id ? "Edit call / proposal" : "Add call / proposal")}
+  <form class="dlg-body"><div class="form">
+    ${fld("Gym", gymSelect("m-gym", m.gymId), "wide")}
+    ${fld("Type", `<select id="m-kind">${opts(MEETING_KINDS, m.kind)}</select>`)}
+    ${fld("Meeting date", inp("m-date", m.date, "date"))}
+    ${fld("Time", inp("m-time", m.time, "text", 'placeholder="e.g. 2:30 pm"'))}
+    ${fld("Booked on", inp("m-booked", m.bookedOn, "date"))}
+    ${fld("Call status", `<select id="m-state">${opts(MEETING_STATES, m.state||"scheduled")}</select>`)}
+  </div>
+  <div class="calc"><span class="eyebrow">Proposal</span><div class="form">
+    ${fld("Proposal amount ($/mo)", inp("m-amt", m.proposalAmount, "number", 'min="0"'))}
+    ${fld("Proposal sent on", inp("m-sent", m.proposalSent, "date"))}
+    ${fld("Outcome", `<select id="m-out">${opts(OUTCOMES, m.outcome||"pending")}</select>`)}
+  </div></div>
+  ${fld("Notes", `<textarea id="m-notes">${esc(m.notes)}</textarea>`)}
+  <p class="muted" style="margin:0;font-size:12px">Won creates the client record. Lost or stalled asks for the objection.</p></form>
+  <div class="dlg-foot">${id?`<button class="btn danger" data-act="delMeeting" data-id="${id}" style="margin-right:auto">Delete</button>`:""}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveMeeting">Save</button></div>`);
+  $("#m-amt").addEventListener("input", () => { if (val("m-amt") && !val("m-sent")) $("#m-sent").value = today(); });
+}
+async function saveMeeting(){
+  if (!needDb()) return;
+  const gymId = val("m-gym"); if (!gymId) { toast("Choose a gym."); return; }
+  const prevOutcome = editingMeeting.id ? S.meetings.find(x => x.id === editingMeeting.id)?.outcome : null;
+  const m = {id: editingMeeting.id || newId("meetings"), gymId, kind:val("m-kind"), date:val("m-date"), time:val("m-time"), bookedOn:val("m-booked") || today(), state:val("m-state"),
+    proposalAmount:val("m-amt"), proposalSent:val("m-sent"), outcome:val("m-out"), notes:val("m-notes"), created: editingMeeting.created || new Date().toISOString()};
+  if (num(m.proposalAmount) && !m.proposalSent) m.proposalSent = today();
+  try {
+    await putDoc("meetings", m);
+    const g = clean(gymById(gymId));
+    advance(g, "call booked");
+    if (m.proposalSent) advance(g, "proposal sent");
+    let then = null;
+    if (m.outcome === "won") {
+      advance(g, "won");
+      g.client = {fee: num(g.client?.fee) || num(m.proposalAmount), startDate: g.client?.startDate || today(), active: true, caseStudy: !!g.client?.caseStudy};
+      then = "client";
+    } else if (m.outcome === "lost") { advance(g, "lost"); if (!g.objection?.category) then = "objection"; }
+    else if (m.outcome === "stalled" && !g.objection?.category) then = "objection";
+    if (m.state === "held" && (m.kind === "Discovery call")) { /* no status change beyond call booked */ }
+    await putGym(g);
+    toast(m.outcome === "won" && prevOutcome !== "won" ? "Won! Client record created. Confirm the fee and start date." : "Saved");
+    if (then && m.outcome !== prevOutcome) setTimeout(() => openGym(gymId, then), 50); else closeDlg();
+  } catch(e){ fail(e); }
+}
+
+let editingResult = null;
+function openResult(id, gymId){
+  const list = clients(); if (!list.length) return;
+  const r = id ? clean(S.results.find(x => x.id === id) || {}) : {gymId: gymId || list[0].id, month: today().slice(0,7)};
+  r.id = id || null; editingResult = r;
+  openDlg(`${head(id ? "Edit month" : "Log a month of results")}
+  <form class="dlg-body"><div class="form">
+    ${fld("Client", gymSelect("r-gym", r.gymId, list), "wide")}
+    ${fld("Month", inp("r-month", r.month, "month"))}
+    ${fld("Leads recovered", inp("r-leads", r.leads, "number", 'min="0"'))}
+    ${fld("Members reactivated", inp("r-react", r.reactivated, "number", 'min="0"'))}
+    ${fld("Revenue recovered ($)", inp("r-rev", r.revenue, "number", 'min="0"'))}
+    ${fld("Notes", `<textarea id="r-notes">${esc(r.notes)}</textarea>`, "wide")}
+  </div></form>
+  <div class="dlg-foot">${id?`<button class="btn danger" data-act="delResult" data-id="${id}" style="margin-right:auto">Delete</button>`:""}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveResult">Save</button></div>`);
+}
+async function saveResult(){
+  if (!needDb()) return;
+  const month = val("r-month"); if (!/^\d{4}-\d{2}$/.test(month)) { toast("Pick a month."); return; }
+  const r = {id: editingResult.id || newId("results"), gymId:val("r-gym"), month, leads:num(val("r-leads")), reactivated:num(val("r-react")), revenue:num(val("r-rev")), notes:val("r-notes")};
+  const dup = S.results.find(x => x.gymId === r.gymId && x.month === month && x.id !== r.id);
+  if (dup) r.id = dup.id;
+  try { await putDoc("results", r); closeDlg(); toast(dup ? "Updated that month" : "Saved"); } catch(e){ fail(e); }
+}
+
+function pickGym(then){
+  if (!S.gyms.length) { toast("Add or import a gym first."); return; }
+  openDlg(`${head(then === "audit" ? "Log a phone audit" : "Log an objection")}
+  <div class="dlg-body">${fld("Which gym?", gymSelect("pick-gym", ""))}</div>
+  <div class="dlg-foot"><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="pickGo" data-then="${then}">Continue</button></div>`);
+}
+
+// ---------- CSV ----------
+function parseCSV(text){
+  text = text.replace(/^﻿/, "");
+  const rows = []; let row = [], f = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i+1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && text[i+1] === "\n") i++; row.push(f); rows.push(row); row = []; f = ""; }
+    else f += c;
+  }
+  if (f !== "" || row.length) { row.push(f); rows.push(row); }
+  return rows.filter(r => r.some(x => x.trim() !== ""));
+}
+const ALIASES = {
+  name:["name","gym","gymname","business","businessname","company","companyname","prospect"],
+  city:["city","town","location"], website:["website","url","site","web","websiteurl","domain"],
+  phone:["phone","phonenumber","telephone","tel","mainphone","phone1"],
+  contact:["owner","contact","ownercontact","contactname","ownername","manager","decisionmaker","ownerorcontact"],
+  email:["email","emailaddress","mail","ownersemail","contactemail"], type:["type","gymtype","category"],
+  size:["size","gymsize","members","membercount"], source:["source","leadsource"],
+  status:["status","outreachstatus","stage"], notes:["notes","note","comments"], nextAction:["nextaction","nextstep"], dueDate:["duedate","due"]
+};
+const FIELD_LABEL = {name:"Name",city:"City",website:"Website",phone:"Phone",contact:"Owner/contact",email:"Email",type:"Gym type",size:"Size",source:"Lead source",status:"Status",notes:"Notes",nextAction:"Next action",dueDate:"Due date"};
+function normSource(v, fallback){
+  const s = (v||"").toLowerCase();
+  if (!s) return fallback; if (s.includes("audit") || s.includes("phone")) return "Phone audit"; if (s.includes("email")) return "Cold email";
+  if (s.includes("refer")) return "Referral"; if (s.includes("walk")) return "Walk-in"; return "Other";
+}
+let pendingImport = null;
+function handleCsv(text){
+  const rows = parseCSV(text);
+  if (rows.length < 2) { toast("That file has no rows to import."); return; }
+  const hdr = rows[0].map(h => h.toLowerCase().replace(/[^a-z0-9]/g,""));
+  const map = {};
+  for (const [field, al] of Object.entries(ALIASES)) { const i = hdr.findIndex(h => al.includes(h)); if (i >= 0) map[field] = i; }
+  if (map.name === undefined) { toast("Couldn't find a gym name column. Name the column \"Name\" and try again."); return; }
+  const existing = new Set(S.gyms.map(g => (g.name+"|"+(g.city||"")).toLowerCase()));
+  const items = [], dups = [];
+  for (const r of rows.slice(1)) {
+    const get = k => map[k] !== undefined ? (r[map[k]] || "").trim() : "";
+    const name = get("name"); if (!name) continue;
+    const key = (name+"|"+get("city")).toLowerCase();
+    const st = get("status").toLowerCase();
+    const due = get("dueDate");
+    const item = {name, city:get("city"), website:get("website"), phone:get("phone"), contact:get("contact"), email:get("email"), type:get("type"), size:get("size"),
+      sourceRaw:get("source"), status: STATUSES.includes(st) ? st : "not contacted", notes:get("notes"), nextAction:get("nextAction"), dueDate: /^\d{4}-\d{2}-\d{2}$/.test(due) ? due : ""};
+    if (existing.has(key)) dups.push(item); else { existing.add(key); items.push(item); }
+  }
+  pendingImport = items;
+  const unmapped = rows[0].filter((h,i) => !Object.values(map).includes(i));
+  openDlg(`${head("Import gyms from CSV")}
+  <div class="dlg-body">
+    <div class="kpis"><div class="kpi"><span class="eyebrow">New gyms</span><b>${items.length}</b></div><div class="kpi"><span class="eyebrow">Already in list</span><b>${dups.length}</b><span class="sub">same name + city, skipped</span></div></div>
+    <div><div class="eyebrow">Columns matched</div><p style="margin:4px 0 0">${Object.keys(map).map(k => `<span class="pill st-won">${FIELD_LABEL[k]} ← ${esc(rows[0][map[k]])}</span>`).join(" ")}</p>
+    ${unmapped.length ? `<p class="muted" style="font-size:12px">Ignored columns: ${unmapped.map(esc).join(", ")}</p>` : ""}</div>
+    ${fld("Lead source for rows that don't have one", `<select id="imp-src">${opts(SOURCES, "Other")}</select>`)}
+    ${items.length ? `<div class="tablewrap"><table><thead><tr><th>Name</th><th>City</th><th>Contact</th><th>Phone</th></tr></thead><tbody>${items.slice(0,5).map(i => `<tr><td>${esc(i.name)}</td><td>${esc(i.city)}</td><td>${esc(i.contact)}</td><td>${esc(i.phone)}</td></tr>`).join("")}</tbody></table></div>${items.length>5?`<span class="muted">…and ${items.length-5} more</span>`:""}` : ""}
+    <div id="imp-progress" class="muted"></div>
+  </div>
+  <div class="dlg-foot"><button class="btn" data-act="close">Cancel</button>${items.length?`<button class="btn primary" data-act="runImport" id="imp-go">Import ${items.length} gyms</button>`:""}</div>`);
+}
+async function runImport(btn){
+  if (!needDb() || !pendingImport) return;
+  btn.disabled = true;
+  const fb = val("imp-src"), prog = $("#imp-progress"), now = new Date().toISOString();
+  let done = 0;
+  try {
+    for (const i of pendingImport) {
+      const {sourceRaw, ...rest} = i;
+      const g = {...rest, source: normSource(sourceRaw, fb), created: now, reached: RANK[rest.status] ?? 0};
+      await db.collection("gyms").doc(newId("gyms")).set(clean(g));
+      done++; if (done % 5 === 0 || done === pendingImport.length) prog.textContent = `Imported ${done} of ${pendingImport.length}…`;
+    }
+    pendingImport = null; closeDlg(); toast(`Imported ${done} gyms`); go("prospects");
+  } catch(e){ fail(e); prog.textContent = `Stopped after ${done} gyms. Import the file again to add the rest; gyms already imported are skipped.`; btn.disabled = false; }
+}
+const csvCell = v => { v = String(v ?? ""); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+async function save(filename, data){
+  if (!downloads) { toast("Downloads aren't available in this view."); return; }
+  try { await downloads.save({filename, data}); } catch(e){ if (e?.code !== "declined") toast("Couldn't save the file."); }
+}
+function exportCsv(){
+  const lt = lastTouchMap();
+  const cols = ["Name","City","Website","Phone","Owner/contact","Email","Gym type","Size","Lead source","Status","Last touch","Next action","Due date","Audit date","Audit result","Response min","Follow-up","Audit score","Est lost per month","Objection","Objection detail","Monthly fee","Client start","Notes"];
+  const rows = S.gyms.map(g => [g.name,g.city,g.website,g.phone,g.contact,g.email,g.type,g.size,g.source,g.status,lt[g.id]||"",g.nextAction,g.dueDate,g.audit?.date,g.audit?.answered,g.audit?.responseMin,g.audit?.followUp,g.audit?.score,g.audit?.date?Math.round(auditLoss(g.audit)):"",g.objection?.category,g.objection?.detail,g.client?.fee,g.client?.startDate,g.notes]);
+  save(`dfw-gyms-${today()}.csv`, [cols, ...rows].map(r => r.map(csvCell).join(",")).join("\n"));
+}
+function exportJson(){
+  save(`revenue-recovery-hq-backup-${today()}.json`, JSON.stringify({exported:new Date().toISOString(), gyms:S.gyms, touches:S.touches, meetings:S.meetings, results:S.results, settings:S.settings}, null, 2));
+}
+function template(){
+  save("dfw-gyms-template.csv", "Name,City,Website,Phone,Owner/contact,Email,Gym type,Size,Lead source,Notes\nExample Fitness (delete this row),Plano,examplefitness.com,(972) 555-0100,Jordan Lee,jordan@examplefitness.com,Boutique / studio,Small (<300 members),Phone audit,\n");
+}
+
+// ---------- delete helpers ----------
+function arm(btn){ if (btn.dataset.armed) return true; btn.dataset.armed = "1"; const t = btn.textContent; btn.textContent = "Click again to delete"; setTimeout(() => { if (btn.isConnected) { delete btn.dataset.armed; btn.textContent = t; } }, 3500); return false; }
+async function delGym(id){
+  try {
+    for (const t of S.touches.filter(x => x.gymId === id)) await db.collection("touches").doc(t.id).delete();
+    for (const m of S.meetings.filter(x => x.gymId === id)) await db.collection("meetings").doc(m.id).delete();
+    for (const r of S.results.filter(x => x.gymId === id)) await db.collection("results").doc(r.id).delete();
+    await db.collection("gyms").doc(id).delete();
+    closeDlg(); toast("Gym deleted");
+  } catch(e){ fail(e); }
+}
+
+// ---------- events ----------
+function go(v){ S.view = v; try { history.replaceState(null, "", "#" + v); } catch { location.hash = v; } render(); window.scrollTo(0,0); }
+const ACT = {
+  go: d => go(d.v),
+  close: () => closeDlg(),
+  newGym: () => openGym(null),
+  openGym: d => openGym(d.id, d.sec),
+  saveGym: () => saveGym(),
+  delGym: (d, b) => { if (needDb() && arm(b)) delGym(d.id); },
+  newTouch: d => openTouch(d.gym),
+  saveTouch: () => saveTouch(),
+  addTouchInline: () => addTouchInline(),
+  delTouch: async (d, b) => { if (!needDb() || !arm(b)) return; try { await db.collection("touches").doc(d.id).delete(); toast("Touch deleted"); b.closest(".mini-item")?.remove(); } catch(e){ fail(e); } },
+  newMeeting: async d => { if (dlg.open && editing?.id && $("#gym-form")) { if (!(await saveGym(true))) return; } openMeeting(null, d.gym); },
+  editMeeting: d => openMeeting(d.id),
+  saveMeeting: () => saveMeeting(),
+  delMeeting: async (d, b) => { if (!needDb() || !arm(b)) return; try { await db.collection("meetings").doc(d.id).delete(); closeDlg(); toast("Deleted"); } catch(e){ fail(e); } },
+  newResult: d => openResult(null, d.gym),
+  editResult: d => openResult(d.id),
+  saveResult: () => saveResult(),
+  delResult: async (d, b) => { if (!needDb() || !arm(b)) return; try { await db.collection("results").doc(d.id).delete(); closeDlg(); toast("Deleted"); } catch(e){ fail(e); } },
+  toggleStar: async d => { if (!needDb()) return; const g = clean(gymById(d.id)); g.client = {...(g.client||{}), caseStudy: !g.client?.caseStudy}; try { await putGym(g); } catch(e){ fail(e); } },
+  pickGym: d => pickGym(d.then),
+  pickGo: d => { const id = val("pick-gym"); if (!id) { toast("Choose a gym."); return; } openGym(id, d.then); },
+  importCsv: () => { const f = $("#csv-file"); f.value = ""; f.click(); },
+  runImport: (d, b) => runImport(b),
+  exportCsv, exportJson, template,
+  clearFilters: () => { S.f = {q:"",city:"",status:"",source:"",type:""}; saveFilters(); render(); },
+  statusFilter: d => { S.f.status = S.f.status === d.s ? "" : d.s; saveFilters(); render(); }
+};
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  if (b.tagName === "TR" && e.target.closest("button,select,a,input")) return;
+  e.preventDefault();
+  ACT[b.dataset.act]?.(b.dataset, b, e);
+});
+function saveFilters(){ try { localStorage.setItem("rrhq-filters", JSON.stringify(S.f)); } catch {} }
+document.addEventListener("input", e => {
+  const id = e.target.id;
+  if (id && id.startsWith("f-") && $("#view").contains(e.target)) { S.f[id.slice(2)] = e.target.value; saveFilters(); render(); }
+});
+document.addEventListener("change", async e => {
+  const t = e.target;
+  if (t.dataset.change === "status") {
+    if (!needDb()) return;
+    const g = clean(gymById(t.dataset.id)); g.status = t.value;
+    g.reached = t.value === "lost" ? Math.max(g.reached||0, evidenceRank(g)) : Math.max(RANK[t.value] ?? 0, evidenceRank(g));
+    if (t.value === "won" && !g.client) g.client = {fee: num(latestProposal(g.id)), startDate: today(), active: true, caseStudy: false};
+    try { await putGym(g); toast("Status updated");
+      if (t.value === "lost" && !g.objection?.category) openGym(g.id, "objection");
+      if (t.value === "won") openGym(g.id, "client");
+    } catch(err){ fail(err); }
+  }
+});
+document.addEventListener("submit", async e => {
+  e.preventDefault();
+  if (e.target.id === "gym-form") { saveGym(); return; }
+  if (e.target.id === "targets-form") {
+    if (!needDb()) return;
+    const s = clean(S.settings);
+    for (const [k] of METRICS) s.targets[k] = num(val("t-"+k));
+    s.goalClients = Math.max(1, num(val("t-goal")) || 3); s.caseStudyMultiple = num(val("t-cs")) || 3;
+    s.audit = {inquiries:num(val("t-inq")), closeRate:num(val("t-close")), avgDues:num(val("t-dues")), lifetimeMonths:num(val("t-life"))||12};
+    try { await db.doc("settings/main").set(s); toast("Targets saved"); } catch(err){ fail(err); }
+  }
+});
+$("#csv-file").addEventListener("change", e => {
+  const f = e.target.files?.[0]; if (!f) return;
+  const r = new FileReader(); r.onload = () => handleCsv(String(r.result)); r.onerror = () => toast("Couldn't read that file."); r.readAsText(f);
+});
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS.some(v => v[0] === h) && h !== S.view) { S.view = h; render(); } });
+
+// ---------- boot ----------
+{ const h = location.hash.slice(1); if (VIEWS.some(v => v[0] === h)) S.view = h; }
+render();
+const slowTimer = setTimeout(() => { S.slow = true; schedule(); }, 10000);
+function onErr(e){ if (e?.code === "revoked" || e?.code === "unavailable") { S.dbState = "revoked"; schedule(); } else console.error(e); }
+function markLoaded(name, meta){
+  S.loaded.add(name);
+  if (S.loaded.size === 5 && !meta.fromCache && !S.confirmed) { S.confirmed = true; clearTimeout(slowTimer); }
+  schedule();
+}
+(async () => {
+  try { downloads = await window.claude?.use?.("downloads"); } catch { downloads = null; }
+})();
+(async () => {
+  try { db = await window.claude?.use?.("db"); } catch { db = null; }
+  if (!db) { S.dbState = "none"; clearTimeout(slowTimer); schedule(); return; }
+  S.dbState = "ok";
+  for (const name of ["gyms","touches","meetings","results"]) {
+    db.collection(name).onSnapshot(snap => { S[name] = snap.docs.map(d => ({id: d.id, ...d.data()})); markLoaded(name, snap.metadata); }, onErr);
+  }
+  db.doc("settings/main").onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : {};
+    S.settings = {...structuredClone(DEFAULTS), ...d, targets:{...DEFAULTS.targets, ...(d.targets||{})}, audit:{...DEFAULTS.audit, ...(d.audit||{})}};
+    markLoaded("settings", snap.metadata);
+  }, onErr);
+})();
+})();
+</script>
