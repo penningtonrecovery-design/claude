@@ -14,8 +14,3 @@
 **Decision:** Rank US SMB niches with a 0–100 opportunity score: 25% pain, 25% timing (demand peaks in the next 90 days), 20% budget, 15% reachability of the decision-maker, 15% speed to ROI. As of Nov 2026, the top targets are HVAC/plumbing, CPA/tax firms (install window closes mid-December before busy season), insurance agencies (Medicare/ACA enrollment), and dental (year-end benefits recall). Retail/e-commerce is deferred to Q1.
 **Reasoning:** P&G sells across automations, AI agents, strategy/training and custom builds, so niches are ranked on buyer pain and seasonal timing, not on service fit. 2026 surveys show owners hold back mainly over unclear ROI (74%), ease of use (73%) and data security (~50%), so lead offers are narrow, fast-ROI installs such as missed-call recovery, intake and recall.
 **Context:** Built as the "AI Niche Radar" Data dashboard (claude.ai artifact) using US-nationwide scope, Ocean look. Ratings and retainer ranges are judgment calls from web research, not measured data. Revisit monthly as seasonal windows shift.
-
-## 2026-11-20 — Enable the CLI-Anything plugin at the project level
-**Decision:** Register the `HKUDS/CLI-Anything` marketplace and enable its `cli-anything` plugin in `.claude/settings.json`, so the repo carries both settings into every session.
-**Reasoning:** `/plugin` commands can't install plugins in cloud sessions, so a committed project setting is the only way to make the plugin available in both cloud and local sessions.
-**Context:** The plugin helps build stateful CLI interfaces for GUI applications. It is third-party code, so remove the `enabledPlugins` entry if it is no longer wanted.
