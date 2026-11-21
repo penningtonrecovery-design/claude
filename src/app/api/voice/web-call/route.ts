@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getVoiceConfig } from "@/lib/config";
+import { preferencesFromProfile, renderPreferences } from "@/lib/personalization/preferences";
 import { getCurrentUser } from "@/lib/supabase/server";
 import {
   buildCreateWebCallBody,
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name")
+    .select("display_name, memory_enabled, pref_tone, pref_focus, pref_next_steps, pref_faith, pref_avoid_topics, life_context")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -38,7 +39,13 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: buildUpstreamHeaders(voice.apiKey, request.headers.get(SDK_VERSION_HEADER)),
       body: JSON.stringify(
-        buildCreateWebCallBody({ agentId: voice.agentId, displayName: profile?.display_name }),
+        buildCreateWebCallBody({
+          agentId: voice.agentId,
+          displayName: profile?.display_name,
+          preferences: renderPreferences(preferencesFromProfile(profile), {
+            includeLifeContext: Boolean(profile?.memory_enabled),
+          }),
+        }),
       ),
       cache: "no-store",
     });

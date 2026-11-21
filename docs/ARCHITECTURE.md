@@ -107,6 +107,23 @@ The keepsake photo flow:
 5. Removing the photo, or deleting the account (via the admin client, before the auth
    user), deletes the file.
 
+### Knowledge base (Phase 3)
+Structured entries in `src/lib/knowledge/entries.ts`, each with evidence level, caveats,
+sources (with a verified flag) and review status. `selectKnowledge` picks at most two
+**usable** entries (approved, named reviewer, date, all citations verified) whose keywords
+appear in his last three messages; `renderKnowledge` adds them to the prompt before the
+safety instructions. All entries are drafts today. See `docs/knowledge/REVIEW.md`.
+
+### Personalization (Phase 3)
+Fixed-vocabulary preferences on `profiles` (tone, focus, next-step frequency, faith,
+topics to avoid, life context), each mapped to a reviewed instruction by
+`renderPreferences`. Life context is included only with memory on. Preferences go into the
+text prompt (before safety) and into Retell calls as the `{{preferences}}` dynamic variable.
+"Tune how he talks to me" (`/api/preferences/suggest`) sends the in-browser conversation
+once to the model, which may suggest up to three style changes (never faith or life
+context); `parseSuggestions` validates every field and value and screens the reasons; no
+suggestions are made if any of his messages shows risk. He accepts or skips each.
+
 ## Data model
 
 | Table | Purpose | Access |
@@ -135,7 +152,8 @@ reports missing services instead of throwing, so the UI can say "not configured"
 
 ## Planned (later phases)
 - Possible later opt-in: AI-suggested memories he approves.
-- Phase 3, remaining: expanded reviewed knowledge base, advanced personalization, further
-  safety evaluation.
+- Clinician review and approval of knowledge-base entries.
+- A model-based risk check, pending red-team results (see docs/safety/README.md).
+- Knowledge and per-turn safety for voice via Retell's custom LLM integration.
 - Voice safety parity: route voice turns through the same safety pipeline (Retell custom
   LLM websocket) or add post-call review.

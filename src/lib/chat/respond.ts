@@ -1,4 +1,6 @@
 import type { ChatMessage, ChatProvider } from "@/lib/ai/types";
+import { renderKnowledge, selectKnowledge } from "@/lib/knowledge/select";
+import type { KnowledgeEntry } from "@/lib/knowledge/types";
 import { buildSystemPrompt } from "@/lib/persona/system-prompt";
 import {
   classifyMessage,
@@ -22,6 +24,9 @@ export type RespondDeps = {
   displayName?: string | null;
   memories?: { category: string; content: string }[];
   plans?: { topic: string; focus: string | null; openSteps: string[] }[];
+  preferences?: string | null;
+  // Defaults to the approved entries in the repository's knowledge base.
+  knowledgeEntries?: KnowledgeEntry[];
 };
 
 // Screens the latest message, then either returns a fixed crisis response or
@@ -56,6 +61,13 @@ export async function respond(
     displayName: deps.displayName,
     memories: deps.memories,
     plans: deps.plans,
+    preferences: deps.preferences,
+    knowledge: renderKnowledge(
+      selectKnowledge(
+        messages.filter((m) => m.role === "user").slice(-3).map((m) => m.content),
+        deps.knowledgeEntries,
+      ),
+    ),
     safetyInstructions: safetyInstructions(safety.level),
   });
 

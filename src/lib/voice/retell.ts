@@ -15,14 +15,20 @@ export const PASSTHROUGH_RESPONSE_HEADERS = [
 export type WebCallContext = {
   agentId: string;
   displayName?: string | null;
+  // Rendered style preferences, or null for none.
+  preferences?: string | null;
 };
 
-export function buildCreateWebCallBody({ agentId, displayName }: WebCallContext) {
+export function buildCreateWebCallBody({ agentId, displayName, preferences }: WebCallContext) {
   return {
     agent_id: agentId,
     // Shared with Retell only if the user chose a name. Used as
     // {{user_name}} in the agent prompt.
-    retell_llm_dynamic_variables: { user_name: displayName?.trim() || "friend" },
+    retell_llm_dynamic_variables: {
+      user_name: displayName?.trim() || "friend",
+      // Used as {{preferences}} in the agent prompt (see docs/RETELL_SETUP.md).
+      preferences: preferences ?? "No special preferences.",
+    },
     metadata: { app: "fatherly-friend" },
   };
 }

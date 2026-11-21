@@ -72,7 +72,7 @@ describe("POST /api/voice/web-call", () => {
     expect(init.headers["X-Retell-Client-JS-SDK-Version"]).toBe("3.0.3");
     expect(JSON.parse(init.body)).toEqual({
       agent_id: "agent_from_server",
-      retell_llm_dynamic_variables: { user_name: "Marcus" },
+      retell_llm_dynamic_variables: { user_name: "Marcus", preferences: "No special preferences." },
       metadata: { app: "fatherly-friend" },
     });
 

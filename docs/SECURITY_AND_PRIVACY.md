@@ -11,6 +11,8 @@ What this build does, what it relies on, and what it doesn't do yet.
 | Memory notes (opt-in) | `public.memories` | Only what he writes in Settings or explicitly saves from his own chat message; crisis-level text is refused; deletable individually or all at once |
 | Growth plans, steps, step notes | `public.growth_plans`, `public.plan_steps` | Open steps reach the model only with memory on; focus text is sent to OpenAI only when he asks for tailoring |
 | Keepsake photo (optional) and caption | Supabase Storage bucket `keepsakes` (private); caption in `profiles` | Re-encoded server-side (metadata incl. GPS removed); own-folder access only; served by 1-hour signed links; never sent to AI or voice providers; deleted on removal and on account deletion |
+| Style preferences and life context | `public.profiles` | Fixed vocabularies only (database-checked); life context reaches the AI only with memory on; style preferences also sent to Retell at call start |
+| "Tune how he talks to me" | Not stored | The in-browser conversation is sent once to OpenAI when he taps the button; suggestions apply only when he accepts |
 | Monthly reflections | `public.reflections` | Never sent to the model; can't be edited, only deleted |
 | Text conversation | **Not stored by the app** | Lives in the browser tab only. Sent to OpenAI per message |
 | Voice audio and transcripts | Retell AI | Depends on the agent's data-storage setting. **Must be configured and documented before launch** |

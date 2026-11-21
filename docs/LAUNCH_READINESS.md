@@ -11,6 +11,10 @@ every **Blocker** is resolved.
 - [ ] Clinician review of the growth-plan step library (`src/lib/growth/library.ts`), the
       tailoring instructions (`src/lib/growth/tailor.ts`) and the reflection questions and
       scale labels (`src/lib/growth/reflection.ts`), and the check-in notes (`src/lib/checkins.ts`).
+- [ ] Clinician review of the knowledge-base entries and verification of every citation
+      (`docs/knowledge/REVIEW.md`); verify or drop the brief's unconfirmed sources.
+- [ ] Clinician review of the preference wording (`src/lib/personalization/preferences.ts`)
+      and the suggestion instructions (`src/lib/personalization/suggest.ts`).
 - [ ] Re-verify every crisis resource (numbers, hours, wording) in `src/lib/safety/resources.ts`.
 - [x] Build a labelled test set and scorecard for the safety screen (`docs/safety/`).
 - [ ] Clinician review of the test set labels (`src/lib/safety/eval/cases.ts`).

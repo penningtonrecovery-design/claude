@@ -46,6 +46,11 @@ const ROWS: { what: string; stored: string }[] = [
       "Optional. If you add a photo of someone who mattered to you, we re-save it without its hidden details (such as where it was taken) and store it privately so only you can see it. It's shown only as a still picture beside Fatherly Friend, and neither the photo nor its caption is ever sent to the AI or voice service. Removing it, or deleting your account, deletes the file.",
   },
   {
+    what: "How he talks with you",
+    stored:
+      "Your style choices (tone, focus, how often he suggests next steps, topics to avoid, whether faith is welcome) and any life details you tick. Style choices shape every conversation; life details are shared with the AI only while memory is on. If you tap \"Tune how he talks to me\", that conversation is sent once to OpenAI to suggest settings. It isn't saved, and nothing changes unless you accept.",
+  },
+  {
     what: "Memory",
     stored:
       "Off by default. If you turn it on, only what you choose is stored: notes you write in Settings, and things you said in a text conversation that you tap \"Remember this\" on and save. They're used to personalise replies. You can view, delete, or export them at any time.",
