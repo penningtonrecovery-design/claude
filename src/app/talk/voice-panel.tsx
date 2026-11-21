@@ -12,14 +12,24 @@ type RetellModule = typeof import("retell-client-js-sdk");
 // The SDK talks to api.retellai.com by default. We send its one request,
 // create-web-call, to our own route instead, which adds the real key and
 // agent. Anything else the SDK tries to call is refused.
-function proxiedFetch(url: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+// The SDK may not pass our wording through, so a limit message is kept here
+// for describeError.
+let lastLimitMessage: string | null = null;
+
+async function proxiedFetch(url: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const path = new URL(String(url)).pathname;
   if (path !== "/v3/create-web-call") {
-    return Promise.reject(new Error(`Blocked voice request to ${path}`));
+    throw new Error(`Blocked voice request to ${path}`);
   }
   const headers = new Headers(init?.headers);
   headers.delete("Authorization");
-  return fetch("/api/voice/web-call", { ...init, headers, credentials: "same-origin" });
+  lastLimitMessage = null;
+  const res = await fetch("/api/voice/web-call", { ...init, headers, credentials: "same-origin" });
+  if (res.status === 429) {
+    const data = await res.clone().json().catch(() => ({}));
+    if (typeof data.error_message === "string") lastLimitMessage = data.error_message;
+  }
+  return res;
 }
 
 export function VoicePanel({
@@ -215,6 +225,7 @@ export function VoicePanel({
 }
 
 function describeError(err: unknown): string {
+  if (lastLimitMessage) return lastLimitMessage;
   const message = err instanceof Error ? err.message : String(err);
   if (/permission|notallowed|denied/i.test(message)) {
     return "Microphone access was blocked. Allow it in your browser's site settings and try again.";

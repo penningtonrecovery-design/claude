@@ -13,6 +13,7 @@ What this build does, what it relies on, and what it doesn't do yet.
 | Keepsake photo (optional) and caption | Supabase Storage bucket `keepsakes` (private); caption in `profiles` | Re-encoded server-side (metadata incl. GPS removed); own-folder access only; served by 1-hour signed links; never sent to AI or voice providers; deleted on removal and on account deletion |
 | Style preferences and life context | `public.profiles` | Fixed vocabularies only (database-checked); life context reaches the AI only with memory on; style preferences also sent to Retell at call start |
 | "Tune how he talks to me" | Not stored | The in-browser conversation is sent once to OpenAI when he taps the button; suggestions apply only when he accepts |
+| Usage counters | `public.rate_limits` | Counts of messages, calls and AI requests per minute and per day; no content. Users can't read or change them; old windows are deleted as they expire; removed with the account |
 | Monthly reflections | `public.reflections` | Never sent to the model; can't be edited, only deleted |
 | Text conversation | **Not stored by the app** | Lives in the browser tab only. Sent to OpenAI per message |
 | Voice audio and transcripts | Retell AI | Depends on the agent's data-storage setting. **Must be configured and documented before launch** |
@@ -30,6 +31,13 @@ What this build does, what it relies on, and what it doesn't do yet.
   itself (the browser can't choose the agent), and doesn't pass Retell's error bodies back.
 - **Input validation** on all API routes and server actions (zod): roles limited to
   user/assistant (no injected system messages), length and count limits.
+- **Per-user rate limits** on text chat (10 a minute, 200 a day), voice calls (3 a minute,
+  10 a day), plan tailoring (3 / 10), style suggestions (2 / 5), photo uploads (3 / 10) and
+  data downloads (2 / 5). The limits live inside the database function
+  `consume_rate_limit`, so a caller can't choose its own. A crisis message is screened
+  first and always gets the fixed crisis reply, even over the limit. If the check itself
+  fails, the request is allowed and a warning is logged. Voice call length is capped in
+  Retell's agent settings (30 minutes; see RETELL_SETUP.md).
 - **Open-redirect protection** on sign-in callbacks.
 - **Data minimisation:** no transcript storage, memory off by default, OpenAI `store: false`,
   name is optional and is the only profile detail shared with Retell.
@@ -49,7 +57,8 @@ What this build does, what it relies on, and what it doesn't do yet.
 
 ## Not done yet (tracked in LAUNCH_READINESS.md)
 
-- Rate limiting on `/api/chat`, `/api/plans/tailor` and `/api/voice/web-call` (cost and abuse control).
+- Limits across all users combined (a spending ceiling) and per-IP limits; set a monthly
+  budget cap in the OpenAI and Retell dashboards as a backstop.
 - Application-level encryption for memory notes.
 - Security headers / Content-Security-Policy review.
 - Retell data-storage configuration and privacy-page wording for voice.

@@ -127,6 +127,17 @@ once to the model, which may suggest up to three style changes (never faith or l
 context); `parseSuggestions` validates every field and value and screens the reasons; no
 suggestions are made if any of his messages shows risk. He accepts or skips each.
 
+### Rate limits
+Each costly request first calls the database function `consume_rate_limit(action)` as the
+signed-in user (`src/lib/rate-limit.ts`). It counts uses per UTC minute and UTC day in
+`rate_limits`, under an advisory lock so parallel requests can't slip past, and refuses
+without counting once a limit is reached, saying how long until the window resets. The
+limits are defined inside the function. For chat, tailoring and suggestions the check runs
+after the safety screen and just before the model call, so a crisis message is never
+blocked. Voice, photo upload and data export check before doing any work. A refusal returns
+429 with a `Retry-After` header and a calm message the screens show as-is; if the check
+itself errors, the request goes ahead and a warning is logged.
+
 ## Data model
 
 | Table | Purpose | Access |
@@ -137,6 +148,7 @@ suggestions are made if any of his messages shows risk. He accepts or skips each
 | `growth_plans` | topic, focus, status | user CRUD on own rows |
 | `plan_steps` | step text, source (library/ai/user), done, note | user CRUD on own rows; insert/update also require the parent plan to be the user's |
 | `storage.objects` (bucket `keepsakes`) | keepsake photo, one per user | user reads/writes only `<own id>/…`; private bucket |
+| `rate_limits` | usage counts per action, minute and day (no content) | no direct access; only through `consume_rate_limit` |
 | `reflections` | five 1–5 ratings (nullable), notes, proud-of | user read/insert/delete own; no edits |
 
 ## Provider abstraction

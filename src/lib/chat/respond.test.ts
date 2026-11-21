@@ -17,6 +17,33 @@ function fakeProvider(reply = "Tell me more about that.") {
 
 const user = (content: string) => [{ role: "user" as const, content }];
 
+const refused = { allowed: false as const, window: "day" as const, retryAfterSeconds: 3600 };
+
+describe("respond with rate limits", () => {
+  it("answers a crisis message even when he is over the limit", async () => {
+    const { provider } = fakeProvider();
+    const checkLimit = vi.fn(async () => refused);
+    const outcome = await respond(user("I want to kill myself"), { provider, checkLimit });
+    expect(outcome).toEqual({ kind: "reply", reply: CRISIS_RESPONSE, safety: "crisis", source: "safety" });
+    expect(checkLimit).not.toHaveBeenCalled();
+  });
+
+  it("refuses without calling the model when over the limit, keeping the safety level", async () => {
+    const { provider } = fakeProvider();
+    const outcome = await respond(user("I feel completely hopeless"), { provider, checkLimit: async () => refused });
+    expect(outcome).toEqual({ kind: "rate_limited", safety: "distress", limit: refused });
+    expect(provider.generate).not.toHaveBeenCalled();
+  });
+
+  it("counts one use per model reply", async () => {
+    const { provider } = fakeProvider();
+    const checkLimit = vi.fn(async () => ({ allowed: true as const }));
+    const outcome = await respond(user("Work has been rough"), { provider, checkLimit });
+    expect(outcome.kind).toBe("reply");
+    expect(checkLimit).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("respond", () => {
   it("answers crisis messages with the fixed response and never calls the model", async () => {
     const { provider } = fakeProvider();

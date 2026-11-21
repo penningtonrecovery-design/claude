@@ -5,13 +5,14 @@ import { describeSuggestion, MIN_USER_MESSAGES, type Suggestion } from "@/lib/pe
 import { acceptSuggestion } from "@/app/settings/preference-actions";
 
 type Message = { role: "user" | "assistant"; content: string };
-type Status = "idle" | "loading" | "shown" | "none" | "not_now" | "error";
+type Status = "idle" | "loading" | "shown" | "none" | "not_now" | "limited" | "error";
 
 // Lets him ask for style suggestions based on this conversation. The
 // conversation is sent once for this request and not stored; nothing changes
 // unless he accepts a suggestion.
 export function TuneSuggestions({ messages, configured }: { messages: Message[]; configured: boolean }) {
   const [status, setStatus] = useState<Status>("idle");
+  const [limitNote, setLimitNote] = useState("");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [decided, setDecided] = useState<Record<number, "accepted" | "skipped">>({});
   const [saving, startSaving] = useTransition();
@@ -29,6 +30,10 @@ export function TuneSuggestions({ messages, configured }: { messages: Message[];
         body: JSON.stringify({ messages: messages.slice(-40) }),
       });
       const data = await res.json().catch(() => ({}));
+      if (res.status === 429 && typeof data.message === "string") {
+        setLimitNote(data.message);
+        return setStatus("limited");
+      }
       if (!res.ok) return setStatus("error");
       if (data.kind === "not_now") return setStatus("not_now");
       const list: Suggestion[] = Array.isArray(data.suggestions) ? data.suggestions : [];
@@ -96,6 +101,7 @@ export function TuneSuggestions({ messages, configured }: { messages: Message[];
       )}
       {status === "none" && <p className="text-sm text-sand">Nothing to change. The way you&apos;re talking now seems to suit you.</p>}
       {status === "not_now" && <p className="text-sm text-sand">Let&apos;s leave settings for another time and stay with what you&apos;re going through.</p>}
+      {status === "limited" && <p className="text-sm text-sand">{limitNote}</p>}
       {status === "error" && <p className="text-sm text-sand">Suggestions aren&apos;t available right now. You can always adjust things in Settings.</p>}
       <button type="button" onClick={() => setStatus("idle")} className="mt-3 text-xs text-dust hover:text-cream">
         Close

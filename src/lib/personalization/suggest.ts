@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ChatMessage, ChatProvider } from "@/lib/ai/types";
+import type { RateLimitResult } from "@/lib/rate-limit";
 import { classifyMessage } from "@/lib/safety/classifier";
 import {
   AVOID_TOPICS,
@@ -34,7 +35,8 @@ export type SuggestOutcome =
   | { kind: "suggestions"; suggestions: Suggestion[] }
   | { kind: "too_short" }
   | { kind: "not_now" }
-  | { kind: "not_configured" };
+  | { kind: "not_configured" }
+  | { kind: "rate_limited"; limit: Extract<RateLimitResult, { allowed: false }> };
 
 export const SUGGEST_INSTRUCTIONS = `You help an AI companion called Fatherly Friend adjust its conversational style to suit one man.
 Read the conversation and suggest at most ${MAX_SUGGESTIONS} changes to his style preferences, only where the conversation gives clear evidence. Suggest nothing if unsure.
@@ -87,12 +89,18 @@ export async function suggestPreferences(
   messages: ChatMessage[],
   current: Preferences,
   provider: ChatProvider | null,
+  // Counts one model request; called only once the conversation is screened.
+  checkLimit?: () => Promise<RateLimitResult>,
 ): Promise<SuggestOutcome> {
   const userMessages = messages.filter((m) => m.role === "user");
   if (userMessages.length < MIN_USER_MESSAGES) return { kind: "too_short" };
   // Style tuning is the wrong moment if anything he said signals risk.
   if (userMessages.some((m) => classifyMessage(m.content).level !== "none")) return { kind: "not_now" };
   if (!provider) return { kind: "not_configured" };
+  if (checkLimit) {
+    const limit = await checkLimit();
+    if (!limit.allowed) return { kind: "rate_limited", limit };
+  }
 
   const transcript = messages.map((m) => `${m.role === "user" ? "HIM" : "FATHERLY FRIEND"}: ${m.content}`).join("\n");
   const currentText = `Current settings: tone=${current.tone}, focus=${current.focus}, nextSteps=${current.nextSteps}, avoidTopics=${current.avoidTopics.join("|") || "none"}`;

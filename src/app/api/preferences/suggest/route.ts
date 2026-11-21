@@ -3,6 +3,7 @@ import { getChatProvider } from "@/lib/ai";
 import { chatRequestSchema } from "@/lib/chat/validation";
 import { preferencesFromProfile } from "@/lib/personalization/preferences";
 import { suggestPreferences } from "@/lib/personalization/suggest";
+import { consumeRateLimit, limitMessage, retryAfterHeader } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 // Suggests style preferences from the conversation he chose to share. The
@@ -22,8 +23,19 @@ export async function POST(request: NextRequest) {
     .maybeSingle();
 
   try {
-    const outcome = await suggestPreferences(parsed.data.messages, preferencesFromProfile(profile), getChatProvider());
+    const outcome = await suggestPreferences(
+      parsed.data.messages,
+      preferencesFromProfile(profile),
+      getChatProvider(),
+      () => consumeRateLimit(supabase, "suggest"),
+    );
     if (outcome.kind === "not_configured") return NextResponse.json({ error: "ai_not_configured" }, { status: 503 });
+    if (outcome.kind === "rate_limited") {
+      return NextResponse.json(
+        { error: "rate_limited", message: limitMessage("suggest", outcome.limit) },
+        { status: 429, headers: retryAfterHeader(outcome.limit) },
+      );
+    }
     return NextResponse.json(outcome);
   } catch {
     console.error("[preferences] suggestion request failed");

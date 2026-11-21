@@ -6,6 +6,7 @@ import { z } from "zod";
 import { KEEPSAKE_BUCKET } from "@/lib/companion/keepsake";
 import { keepsakePath, MAX_CAPTION_CHARS, parseCompanionChoice } from "@/lib/companion/options";
 import { processKeepsakePhoto } from "@/lib/companion/process-photo";
+import { consumeRateLimit, limitMessage } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 export type CompanionState = { error?: string; ok?: string } | undefined;
@@ -56,6 +57,11 @@ export async function uploadKeepsake(_prev: CompanionState, formData: FormData):
   const file = formData.get("photo");
   if (!(file instanceof File) || file.size === 0) return { error: "Choose a photo to upload." };
 
+  const { supabase, user } = await requireUser();
+  // Checked before the photo is processed, which is the expensive part.
+  const limit = await consumeRateLimit(supabase, "upload");
+  if (!limit.allowed) return { error: limitMessage("upload", limit) };
+
   const processed = await processKeepsakePhoto(Buffer.from(await file.arrayBuffer()));
   if (!processed.ok) {
     const message = {
@@ -66,7 +72,6 @@ export async function uploadKeepsake(_prev: CompanionState, formData: FormData):
     return { error: message };
   }
 
-  const { supabase, user } = await requireUser();
   const path = keepsakePath(user.id);
   const { error: uploadError } = await supabase.storage
     .from(KEEPSAKE_BUCKET)

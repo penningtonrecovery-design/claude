@@ -73,6 +73,10 @@ export function TextChat({
       if (res.ok && data.reply) {
         setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
         setNotice(null);
+      } else if (res.status === 429 && typeof data.message === "string") {
+        setNotice(data.message);
+        setMessages((m) => m.slice(0, -1));
+        setDraft(content);
       } else if (res.status === 503) {
         setNotice("Text replies aren't configured on this server yet, so he can't answer this one.");
       } else if (res.status === 401) {

@@ -115,6 +115,16 @@ describe("suggestPreferences", () => {
     expect(p.generate).not.toHaveBeenCalled();
   });
 
+  it("stops at the limit without calling the model, and never counts a risky conversation", async () => {
+    const refused = { allowed: false as const, window: "day" as const, retryAfterSeconds: 60 };
+    const checkLimit = vi.fn(async () => refused);
+    const p = provider("{}");
+    expect(await suggestPreferences(convo(["work is busy", "my son is good", "I feel hopeless", "anyway"]), DEFAULT_PREFERENCES, p, checkLimit)).toEqual({ kind: "not_now" });
+    expect(checkLimit).not.toHaveBeenCalled();
+    expect(await suggestPreferences(convo(["a", "b", "c", "d"]), DEFAULT_PREFERENCES, p, checkLimit)).toEqual({ kind: "rate_limited", limit: refused });
+    expect(p.generate).not.toHaveBeenCalled();
+  });
+
   it("returns parsed suggestions from the model", async () => {
     const outcome = await suggestPreferences(
       convo(["just tell me straight", "skip the feelings stuff", "what do I actually do", "be blunt"]),

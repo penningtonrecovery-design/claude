@@ -47,6 +47,16 @@ describe("tailorSteps", () => {
     expect(p.generate).not.toHaveBeenCalled();
   });
 
+  it("screens his focus before counting a use, and stops at the limit", async () => {
+    const refused = { allowed: false as const, window: "day" as const, retryAfterSeconds: 60 };
+    const checkLimit = vi.fn(async () => refused);
+    const { p } = provider('{"steps": ["x"]}');
+    expect(await tailorSteps("confidence", "honestly I want to kill myself", { provider: p, checkLimit })).toEqual({ kind: "crisis" });
+    expect(checkLimit).not.toHaveBeenCalled();
+    expect(await tailorSteps("boundaries", "saying no at work", { provider: p, checkLimit })).toEqual({ kind: "rate_limited", limit: refused });
+    expect(p.generate).not.toHaveBeenCalled();
+  });
+
   it("escalates on a moderation crisis signal", async () => {
     const { p } = provider('{"steps": ["x"]}');
     const outcome = await tailorSteps("confidence", "giving my things away", {

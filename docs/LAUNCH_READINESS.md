@@ -42,7 +42,10 @@ every **Blocker** is resolved.
 
 ## Security (Blockers)
 
-- [ ] Rate limiting and per-user quotas on chat and voice endpoints.
+- [x] Rate limiting and per-user quotas on chat, voice, tailoring, suggestions, uploads and
+      exports (`consume_rate_limit`; limits in docs/SECURITY_AND_PRIVACY.md).
+- [ ] Set the 30-minute maximum call duration on the Retell agent (docs/RETELL_SETUP.md).
+- [ ] Set monthly spending caps in the OpenAI and Retell dashboards.
 - [ ] Hosted Supabase: custom SMTP, production redirect URLs, auth rate limits, backups,
       point-in-time recovery decision.
 - [ ] Security headers and CSP (allow the Supabase Storage host for keepsake images).

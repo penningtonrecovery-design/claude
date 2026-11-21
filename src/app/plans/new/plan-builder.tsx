@@ -53,6 +53,8 @@ export function PlanBuilder({ aiConfigured, resources }: { aiConfigured: boolean
           ...librarySuggestions(topic).map((s) => ({ ...s, selected: false })),
         ]);
         setTailorNote("Here's what he suggests, with the starter steps below. Change anything.");
+      } else if (res.status === 429 && typeof data.message === "string") {
+        setTailorNote(`${data.message} The starter steps are ready to use.`);
       } else if (res.status === 503) {
         setTailorNote("Tailoring isn't configured on this server yet. The starter steps are ready to use.");
       } else {

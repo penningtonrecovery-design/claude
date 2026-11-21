@@ -5,6 +5,7 @@ import { chatRequestSchema } from "@/lib/chat/validation";
 import { getAiConfig } from "@/lib/config";
 import { isTopic, LIBRARY } from "@/lib/growth/library";
 import { preferencesFromProfile, renderPreferences } from "@/lib/personalization/preferences";
+import { consumeRateLimit, limitMessage, retryAfterHeader } from "@/lib/rate-limit";
 import { moderateWithOpenAI } from "@/lib/safety/moderation";
 import { getCurrentUser } from "@/lib/supabase/server";
 
@@ -63,7 +64,15 @@ export async function POST(request: NextRequest) {
       preferences: renderPreferences(preferencesFromProfile(profile), {
         includeLifeContext: Boolean(profile?.memory_enabled),
       }),
+      checkLimit: () => consumeRateLimit(supabase, "chat"),
     });
+
+    if (outcome.kind === "rate_limited") {
+      return NextResponse.json(
+        { error: "rate_limited", message: limitMessage("chat", outcome.limit), safety: outcome.safety },
+        { status: 429, headers: retryAfterHeader(outcome.limit) },
+      );
+    }
 
     if (outcome.kind === "not_configured") {
       return NextResponse.json(

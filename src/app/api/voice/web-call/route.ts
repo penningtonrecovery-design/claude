@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getVoiceConfig } from "@/lib/config";
 import { preferencesFromProfile, renderPreferences } from "@/lib/personalization/preferences";
+import { consumeRateLimit, limitMessage, retryAfterHeader } from "@/lib/rate-limit";
 import { getCurrentUser } from "@/lib/supabase/server";
 import {
   buildCreateWebCallBody,
@@ -24,6 +25,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error_message: "Voice is not configured on this server yet." },
       { status: 503 },
+    );
+  }
+
+  const limit = await consumeRateLimit(supabase, "voice");
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error_message: limitMessage("voice", limit), rate_limited: true },
+      { status: 429, headers: retryAfterHeader(limit) },
     );
   }
 
