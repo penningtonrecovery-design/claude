@@ -38,6 +38,18 @@ What this build does, what it relies on, and what it doesn't do yet.
   first and always gets the fixed crisis reply, even over the limit. If the check itself
   fails, the request is allowed and a warning is logged. Voice call length is capped in
   Retell's agent settings (30 minutes; see RETELL_SETUP.md).
+- **Security headers** on every response (`src/lib/security-headers.ts`, applied in
+  `next.config.ts`): a content security policy that loads scripts, styles and fonts only
+  from the site itself, lets the page talk only to Supabase, Retell and Retell's LiveKit
+  media servers, and forbids framing, plugins and off-site form posts; plus HSTS,
+  `nosniff`, `X-Frame-Options: DENY`, a strict referrer policy, and a permissions policy
+  that allows the microphone for this site only. Scripts still allow inline code because
+  Next.js needs it without per-request nonces; zod's eval probe is switched off
+  (`src/lib/zod.ts`) so it doesn't trip the policy.
+- **Automated checks** on every pull request (`.github/workflows/ci.yml`): lint, types,
+  tests, the database security tests against Postgres, the production build, a gitleaks
+  scan of the full history for leaked keys, and `npm audit` failing on high or critical
+  vulnerabilities. Dependabot opens grouped security-fix pull requests weekly.
 - **Open-redirect protection** on sign-in callbacks.
 - **Data minimisation:** no transcript storage, memory off by default, OpenAI `store: false`,
   name is optional and is the only profile detail shared with Retell.
@@ -60,7 +72,8 @@ What this build does, what it relies on, and what it doesn't do yet.
 - Limits across all users combined (a spending ceiling) and per-IP limits; set a monthly
   budget cap in the OpenAI and Retell dashboards as a backstop.
 - Application-level encryption for memory notes.
-- Security headers / Content-Security-Policy review.
+- A nonce-based content security policy (would remove 'unsafe-inline' for scripts, at the
+  cost of rendering every page per request).
 - Retell data-storage configuration and privacy-page wording for voice.
 - Audit logging for account deletion and exports (without content).
 - Real-time safety screening for voice conversations.

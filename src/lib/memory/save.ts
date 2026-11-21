@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { classifyMessage } from "@/lib/safety/classifier";
 
 export const MEMORY_CATEGORIES = ["goal", "experience", "preference", "challenge", "achievement", "other"] as const;

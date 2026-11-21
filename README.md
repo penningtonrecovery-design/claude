@@ -81,6 +81,9 @@ npm run typecheck
 npm run lint
 ```
 
+The same checks, plus a leaked-key scan and a vulnerable-package check, run automatically
+on every pull request (`.github/workflows/ci.yml`).
+
 `test:rls` runs against plain Postgres with a minimal stand-in for Supabase's `auth`
 schema (`supabase/tests/auth_shim.sql`). Never run that shim against a real Supabase
 database.

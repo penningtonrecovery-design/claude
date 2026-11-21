@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { preferencesSchema } from "@/lib/personalization/preferences";
 import type { Suggestion } from "@/lib/personalization/suggest";
 import { getCurrentUser } from "@/lib/supabase/server";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { AVOID_TOPICS, FOCUSES, NEXT_STEP_FREQUENCIES, TONES } from "@/lib/personalization/preferences";
 
 export type PreferenceState = { error?: string; ok?: string } | undefined;

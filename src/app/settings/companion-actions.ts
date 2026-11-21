@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { KEEPSAKE_BUCKET } from "@/lib/companion/keepsake";
 import { keepsakePath, MAX_CAPTION_CHARS, parseCompanionChoice } from "@/lib/companion/options";
 import { processKeepsakePhoto } from "@/lib/companion/process-photo";

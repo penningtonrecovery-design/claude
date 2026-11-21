@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import type { ChatProvider } from "@/lib/ai/types";
 import { FATHERLY_FRIEND_PROMPT } from "@/lib/persona/system-prompt";
 import type { RateLimitResult } from "@/lib/rate-limit";

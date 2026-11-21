@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { snoozeUntil } from "@/lib/growth/reflection";
 import { parseReflectionForm } from "@/lib/growth/schemas";
 import { getCurrentUser } from "@/lib/supabase/server";

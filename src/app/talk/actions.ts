@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { checkMemory } from "@/lib/memory/save";
 import { getCurrentUser } from "@/lib/supabase/server";
 

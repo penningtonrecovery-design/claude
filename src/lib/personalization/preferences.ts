@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // How he'd like Fatherly Friend to talk with him. Every value comes from a
 // fixed list, so each one maps to a reviewed instruction and nothing he types

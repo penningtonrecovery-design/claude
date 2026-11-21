@@ -1,0 +1,20 @@
+# Security updates only. Routine version bumps are switched off
+# (open-pull-requests-limit: 0); security fixes still open pull requests,
+# grouped so a week's fixes arrive together. Turn on "Dependabot security
+# updates" in the repository's Settings > Code security for this to run.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      security-fixes:
+        applies-to: security-updates
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0

@@ -116,6 +116,8 @@ Sign-in emails go to a local test inbox, not your real email: <http://127.0.0.1:
 ### Talking (voice)
 
 - [ ] "Talk" tab → "Start talking" → allow the microphone → you hear his opening line.
+      If it fails to connect, open the browser's developer tools (right-click → Inspect →
+      Console) and send Claude any red line that mentions "Content Security Policy".
 - [ ] He uses your name if you gave one.
 - [ ] Interrupt him mid-sentence: he stops and listens.
 - [ ] "Pause" mutes you; "Resume" un-mutes; "End conversation" ends it.

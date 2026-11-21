@@ -48,12 +48,16 @@ every **Blocker** is resolved.
 - [ ] Set monthly spending caps in the OpenAI and Retell dashboards.
 - [ ] Hosted Supabase: custom SMTP, production redirect URLs, auth rate limits, backups,
       point-in-time recovery decision.
-- [ ] Security headers and CSP (allow the Supabase Storage host for keepsake images).
+- [x] Security headers and content security policy (`src/lib/security-headers.ts`).
+- [ ] Confirm a real voice call works under the content security policy (browser console
+      shows no "Content Security Policy" errors during a call).
 - [ ] Confirm the image generator's terms allow commercial use of the grandfather portraits
       (`public/companions/`, made with ElevenLabs), and keep a record of how they were made.
 - [ ] Decide whether keepsake uploads need automated content screening (they are visible only
       to the uploader today).
-- [ ] Dependency and secret scanning in CI.
+- [x] Dependency and secret scanning in CI (`.github/workflows/ci.yml`, `.github/dependabot.yml`).
+- [ ] In GitHub Settings → Code security, turn on Dependabot alerts and Dependabot security
+      updates; in Settings → Branches, require the CI checks to pass before merging.
 - [ ] Verify encryption at rest on the chosen Supabase plan; decide on application-level
       encryption for memory notes.
 

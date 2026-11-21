@@ -127,6 +127,14 @@ once to the model, which may suggest up to three style changes (never faith or l
 context); `parseSuggestions` validates every field and value and screens the reasons; no
 suggestions are made if any of his messages shows risk. He accepts or skips each.
 
+### Security headers and CI
+`next.config.ts` sends the headers from `src/lib/security-headers.ts` on every response. The
+content security policy's `connect-src` lists the only outside services the browser talks
+to: Supabase, `api.retellai.com` and `*.livekit.cloud` (Retell's voice media servers). If
+Retell adds a new host, voice will fail with a "Content Security Policy" error in the
+browser console; add the host there. All zod imports go through `src/lib/zod.ts` (lint
+enforces it). `.github/workflows/ci.yml` runs every check on each pull request.
+
 ### Rate limits
 Each costly request first calls the database function `consume_rate_limit(action)` as the
 signed-in user (`src/lib/rate-limit.ts`). It counts uses per UTC minute and UTC day in

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 export const MAX_MESSAGES = 40;
 export const MAX_MESSAGE_CHARS = 4000;

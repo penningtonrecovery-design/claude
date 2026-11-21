@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import type { ChatMessage, ChatProvider } from "@/lib/ai/types";
 import type { RateLimitResult } from "@/lib/rate-limit";
 import { classifyMessage } from "@/lib/safety/classifier";
