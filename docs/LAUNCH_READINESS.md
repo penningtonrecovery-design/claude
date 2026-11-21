@@ -12,11 +12,13 @@ every **Blocker** is resolved.
       tailoring instructions (`src/lib/growth/tailor.ts`) and the reflection questions and
       scale labels (`src/lib/growth/reflection.ts`), and the check-in notes (`src/lib/checkins.ts`).
 - [ ] Re-verify every crisis resource (numbers, hours, wording) in `src/lib/safety/resources.ts`.
-- [ ] Evaluate the safety classifier on a reviewed test set, including indirect language,
-      slang, sarcasm and past-tense disclosures. Measure misses and over-triggers.
+- [x] Build a labelled test set and scorecard for the safety screen (`docs/safety/`).
+- [ ] Clinician review of the test set labels (`src/lib/safety/eval/cases.ts`).
+- [ ] Decide on a model-based risk check: the keyword screen caught only 1–4 of 20 fresh
+      indirect crisis messages (see `docs/safety/README.md`).
+- [ ] Run `npm run redteam` with the production model and review every fail/concern.
 - [ ] Safety handling for **voice** (currently prompt-only; see docs/RETELL_SETUP.md).
-- [ ] Red-team the model for unsafe advice, dependency-building, impersonation, and
-      pressure to disclose trauma.
+- [x] Red-team script for unsafe advice, dependency, impersonation, trauma pressure (`npm run redteam`).
 - [ ] Decide escalation policy for abuse disclosures involving children (mandatory-reporting
       questions are legal, not technical).
 - [ ] Professional review of the psychological knowledge base before it is used. Verify
@@ -39,7 +41,9 @@ every **Blocker** is resolved.
 - [ ] Rate limiting and per-user quotas on chat and voice endpoints.
 - [ ] Hosted Supabase: custom SMTP, production redirect URLs, auth rate limits, backups,
       point-in-time recovery decision.
-- [ ] Security headers and CSP.
+- [ ] Security headers and CSP (allow the Supabase Storage host for keepsake images).
+- [ ] Decide whether keepsake uploads need automated content screening (they are visible only
+      to the uploader today).
 - [ ] Dependency and secret scanning in CI.
 - [ ] Verify encryption at rest on the chosen Supabase plan; decide on application-level
       encryption for memory notes.
@@ -51,4 +55,6 @@ every **Blocker** is resolved.
 - [ ] Voice tested live with your Retell agent: latency, interruption, pause, end, voice choice.
 - [ ] Magic link, password sign-up, confirmation and reset tested end to end against
       local and hosted Supabase.
+- [ ] Keepsake photo upload, display and deletion tested against real Supabase Storage
+      (local and hosted), including large phone photos and HEIC files from iPhones.
 - [ ] Accessibility pass (keyboard, screen reader, contrast).

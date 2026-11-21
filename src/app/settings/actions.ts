@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { isCheckinFrequency } from "@/lib/checkins";
+import { KEEPSAKE_BUCKET } from "@/lib/companion/keepsake";
+import { keepsakePath } from "@/lib/companion/options";
 import { checkMemory } from "@/lib/memory/save";
 import { createAdminClient, getCurrentUser } from "@/lib/supabase/server";
 
@@ -81,6 +83,9 @@ export async function deleteAccount(_prev: ActionState, formData: FormData): Pro
   if (!admin) {
     return { error: "Account deletion isn't configured on this server yet (missing SUPABASE_SECRET_KEY)." };
   }
+  // Stored files don't cascade with the account, so remove the keepsake first.
+  const { error: photoError } = await admin.storage.from(KEEPSAKE_BUCKET).remove([keepsakePath(user.id)]);
+  if (photoError) return { error: "We couldn't remove your photo, so your account wasn't deleted. Please try again." };
   // Profile, memories, plans and reflections are removed by ON DELETE CASCADE.
   const { error } = await admin.auth.admin.deleteUser(user.id);
   if (error) return { error: "We couldn't delete your account. Please try again." };

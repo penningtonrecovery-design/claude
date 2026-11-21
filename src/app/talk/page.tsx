@@ -5,6 +5,8 @@ import { AppHeader, PageLoading } from "@/components/app-header";
 import { CrisisResources } from "@/components/crisis-resources";
 import { ReflectionBanner } from "@/components/reflection-banner";
 import { isCheckinDue, isCheckinFrequency, pickCheckin, type CheckinNote } from "@/lib/checkins";
+import { signKeepsakeUrl } from "@/lib/companion/keepsake";
+import { resolveCompanionView } from "@/lib/companion/options";
 import { getAiConfig, getVoiceConfig } from "@/lib/config";
 import { isReflectionDue } from "@/lib/growth/reflection";
 import { getCurrentUser } from "@/lib/supabase/server";
@@ -33,7 +35,7 @@ async function TalkContent() {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "display_name, onboarding_completed_at, memory_enabled, reflection_prompts_enabled, reflection_snoozed_until, checkin_frequency, checkin_enabled_at, last_checkin_at, last_checkin_key",
+      "display_name, onboarding_completed_at, memory_enabled, reflection_prompts_enabled, reflection_snoozed_until, checkin_frequency, checkin_enabled_at, last_checkin_at, last_checkin_key, companion_mode, avatar_id, keepsake_path, keepsake_caption",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -41,6 +43,12 @@ async function TalkContent() {
   if (!profile?.onboarding_completed_at) return <Onboarding />;
 
   const checkin = await chooseCheckin(supabase, profile);
+  const companion = resolveCompanionView({
+    mode: profile.companion_mode,
+    avatarId: profile.avatar_id,
+    photoUrl: profile.companion_mode === "photo" ? await signKeepsakeUrl(supabase, profile.keepsake_path) : null,
+    caption: profile.keepsake_caption,
+  });
 
   return (
     <>
@@ -56,6 +64,7 @@ async function TalkContent() {
         memoryEnabled={Boolean(profile.memory_enabled)}
         resources={<CrisisResources compact />}
         checkin={checkin}
+        companion={companion}
       />
     </>
   );

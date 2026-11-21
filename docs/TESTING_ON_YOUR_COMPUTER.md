@@ -26,7 +26,6 @@ use the "Terminal" app.
 ```bash
 git clone https://github.com/penningtonrecovery-design/claude.git fatherly-friend
 cd fatherly-friend
-git checkout claude/focused-clarke-2fx2z1
 npm install
 ```
 
@@ -170,6 +169,13 @@ set checkin_enabled_at = now() - interval '31 days', last_checkin_at = null;
 
 - [ ] Refresh Talk → a short note appears. "Reply" moves it into Type; "Thanks" hides it.
 
+### How he appears
+
+- [ ] Settings → "How he appears" → pick an illustrated grandfather → Save → Talk shows him,
+      with "Fatherly Friend is an AI" underneath. During a voice call he glows as he speaks.
+- [ ] Settings → add a photo (try one straight from your phone) with a caption → Talk shows
+      it framed beside the orb. Remove it → it's gone from Talk and Settings.
+
 ### Your data
 
 - [ ] Settings → "Download my data" → a file downloads with your profile, memories,
@@ -185,12 +191,18 @@ set checkin_enabled_at = now() - interval '31 days', last_checkin_at = null;
 
 ---
 
+### Safety red-team (about 5 minutes, small OpenAI cost)
+
+- [ ] With `.env.local` set up, run `npm run redteam`. It finishes with "Report written to
+      …/docs/safety/REDTEAM_REPORT.md". Open that file and skim the summary.
+
 ## Part 8 — What to send back
 
 1. Which boxes didn't tick, with what you saw.
-2. How he *felt* to talk to, in voice and in text: tone, pace, the voice itself,
+2. The file `docs/safety/REDTEAM_REPORT.md` (attach it or paste it).
+3. How he *felt* to talk to, in voice and in text: tone, pace, the voice itself,
    anything that grated.
-3. Anything that confused you.
+4. Anything that confused you.
 
 ## Stopping and restarting
 

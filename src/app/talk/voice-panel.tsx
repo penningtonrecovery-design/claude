@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { WebCallSession } from "retell-client-js-sdk";
+import { AvatarPortrait } from "@/components/avatar-portrait";
+import type { CompanionView } from "@/lib/companion/options";
 
 type Status = "idle" | "connecting" | "live" | "ended" | "error";
 
@@ -20,7 +22,15 @@ function proxiedFetch(url: RequestInfo | URL, init?: RequestInit): Promise<Respo
   return fetch("/api/voice/web-call", { ...init, headers, credentials: "same-origin" });
 }
 
-export function VoicePanel({ configured, displayName }: { configured: boolean; displayName: string | null }) {
+export function VoicePanel({
+  configured,
+  displayName,
+  companion,
+}: {
+  configured: boolean;
+  displayName: string | null;
+  companion: CompanionView;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [muted, setMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,22 +122,53 @@ export function VoicePanel({ configured, displayName }: { configured: boolean; d
 
   return (
     <div className="flex flex-col items-center px-4 py-10 text-center sm:py-14">
-      <div
-        ref={orbRef}
-        aria-hidden
-        style={{ ["--level" as string]: 0 }}
-        className={`relative grid h-44 w-44 place-items-center rounded-full sm:h-52 sm:w-52 ${live ? "" : "animate-breathe"}`}
-      >
+      <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
         <div
-          className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_40%,#ddb174_0%,#b5653b_45%,#3a2418_75%,transparent_76%)] opacity-80 transition-transform duration-100"
-          style={{ transform: "scale(calc(1 + var(--level) * 0.12))" }}
-        />
-        <div
-          className="absolute -inset-6 rounded-full bg-brass/20 blur-2xl transition-opacity duration-100"
-          style={{ opacity: "calc(0.35 + var(--level) * 0.65)" }}
-        />
-        <span className="relative font-serif text-5xl text-ink/80">F</span>
+          ref={orbRef}
+          aria-hidden
+          style={{ ["--level" as string]: 0 }}
+          className={`relative grid h-44 w-44 place-items-center rounded-full sm:h-52 sm:w-52 ${live ? "" : "animate-breathe"}`}
+        >
+          <div
+            className="absolute -inset-6 rounded-full bg-brass/20 blur-2xl transition-opacity duration-100"
+            style={{ opacity: "calc(0.35 + var(--level) * 0.65)" }}
+          />
+          {companion.mode === "avatar" ? (
+            <div
+              className="absolute inset-0 rounded-full ring-2 ring-brass/40 transition-transform duration-100"
+              style={{ transform: "scale(calc(1 + var(--level) * 0.06))" }}
+            >
+              <AvatarPortrait id={companion.avatarId} className="h-full w-full" />
+            </div>
+          ) : (
+            <>
+              <div
+                className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_40%,#ddb174_0%,#b5653b_45%,#3a2418_75%,transparent_76%)] opacity-80 transition-transform duration-100"
+                style={{ transform: "scale(calc(1 + var(--level) * 0.12))" }}
+              />
+              <span className="relative font-serif text-5xl text-ink/80">F</span>
+            </>
+          )}
+        </div>
+
+        {companion.mode === "photo" && (
+          <figure className="flex w-40 flex-col items-center sm:w-48">
+            <div className="rotate-[-1.5deg] rounded-md bg-[#5b4632] p-2.5 shadow-xl shadow-black/50 ring-1 ring-[#7a5f44]">
+              <div className="bg-[#efe6d8] p-1.5">
+                {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed URL */}
+                <img src={companion.photoUrl} alt={companion.caption ? `Keepsake photo: ${companion.caption}` : "Your keepsake photo"} className="aspect-[4/5] w-full object-cover" />
+              </div>
+            </div>
+            {companion.caption && (
+              <figcaption className="mt-3 font-serif text-base italic text-sand">{companion.caption}</figcaption>
+            )}
+          </figure>
+        )}
       </div>
+
+      {companion.mode !== "voice" && (
+        <p className="mt-6 text-xs uppercase tracking-[0.18em] text-dust">Fatherly Friend is an AI</p>
+      )}
 
       <h2 className="mt-8 font-serif text-2xl text-cream sm:text-3xl" aria-live="polite">
         {status === "idle" && (displayName ? `Ready when you are, ${displayName}.` : "Ready when you are.")}
