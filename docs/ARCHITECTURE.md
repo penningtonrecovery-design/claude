@@ -90,15 +90,33 @@ only one prompt shows at a time. **Reply** adds the note to the text chat as Fat
 Friend's next message; **Thanks** dismisses it. Both record `last_checkin_at`. Nothing is
 sent outside the app, and no AI writes the notes.
 
+### Visual companion (Phase 3)
+Settings → "How he appears": voice-only (the orb), one of four illustrated grandfathers
+(`src/components/avatar-portrait.tsx`, inline SVG that glows with the voice), or "Your photo".
+The keepsake photo flow:
+1. The browser shrinks the image to at most 1600 px and sends it to the `uploadKeepsake`
+   server action (body limit 4.4 MB, under Vercel's 4.5 MB).
+2. `processKeepsakePhoto` checks the bytes really are JPEG/PNG/WebP, rejects tiny or
+   oversized files, and re-encodes to a JPEG of at most 1000 px with `sharp`, dropping
+   EXIF/GPS and other metadata.
+3. It is stored at `keepsakes/<user id>/keepsake.jpg` in a private bucket; storage
+   policies allow each user only their own folder.
+4. Pages show it through a signed link valid for one hour. On the Talk page it sits in a
+   still frame beside the orb with an optional caption and "Fatherly Friend is an AI".
+   The photo and caption never reach the language model or Retell.
+5. Removing the photo, or deleting the account (via the admin client, before the auth
+   user), deletes the file.
+
 ## Data model
 
 | Table | Purpose | Access |
 | --- | --- | --- |
 | `auth.users` | Supabase accounts | Supabase Auth |
-| `profiles` | name, memory consent, onboarding confirmations, reflection and check-in preferences | user reads/updates own row; created by trigger; cascades on account deletion |
+| `profiles` | name, memory consent, onboarding confirmations, reflection, check-in and appearance preferences, keepsake path and caption | user reads/updates own row; created by trigger; cascades on account deletion |
 | `memories` | user-written notes (category + ≤500 chars) | user CRUD on own rows only |
 | `growth_plans` | topic, focus, status | user CRUD on own rows |
 | `plan_steps` | step text, source (library/ai/user), done, note | user CRUD on own rows; insert/update also require the parent plan to be the user's |
+| `storage.objects` (bucket `keepsakes`) | keepsake photo, one per user | user reads/writes only `<own id>/…`; private bucket |
 | `reflections` | five 1–5 ratings (nullable), notes, proud-of | user read/insert/delete own; no edits |
 
 ## Provider abstraction
@@ -117,7 +135,7 @@ reports missing services instead of throwing, so the UI can say "not configured"
 
 ## Planned (later phases)
 - Possible later opt-in: AI-suggested memories he approves.
-- Phase 3: avatar choice, personal photo option (secure storage, no impersonation),
-  expanded reviewed knowledge base, further safety evaluation.
+- Phase 3, remaining: expanded reviewed knowledge base, advanced personalization, further
+  safety evaluation.
 - Voice safety parity: route voice turns through the same safety pipeline (Retell custom
   LLM websocket) or add post-call review.

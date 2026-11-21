@@ -7,6 +7,9 @@ import { setReflectionPrompts } from "@/app/reflect/actions";
 import { deleteAllMemories, deleteMemory, setMemoryEnabled } from "./actions";
 import { isCheckinFrequency } from "@/lib/checkins";
 import { AddMemoryForm, CheckinForm, DeleteAccountForm, DisplayNameForm } from "./forms";
+import { CompanionSettings } from "./companion-settings";
+import { signKeepsakeUrl } from "@/lib/companion/keepsake";
+import { DEFAULT_AVATAR, isAvatarId, isCompanionMode } from "@/lib/companion/options";
 
 export const metadata: Metadata = { title: "Settings · Fatherly Friend" };
 
@@ -47,7 +50,7 @@ async function SettingsContent() {
   if (!supabase || !user) redirect("/login?next=/settings");
 
   const [{ data: profile }, { data: memories }] = await Promise.all([
-    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency, companion_mode, avatar_id, keepsake_path, keepsake_caption").eq("id", user.id).maybeSingle(),
     supabase.from("memories").select("id, category, content, source, created_at").order("created_at", { ascending: false }),
   ]);
   const memoryOn = Boolean(profile?.memory_enabled);
@@ -56,6 +59,15 @@ async function SettingsContent() {
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-10 sm:px-6">
       <h1 className="font-serif text-4xl text-cream">Settings</h1>
       <p className="text-sand">Signed in as {user.email}</p>
+
+      <Card title="How he appears" intro="Choose what you see while you talk. You can change it any time.">
+        <CompanionSettings
+          mode={isCompanionMode(profile?.companion_mode) ? profile.companion_mode : "voice"}
+          avatarId={isAvatarId(profile?.avatar_id) ? profile.avatar_id : DEFAULT_AVATAR}
+          photoUrl={await signKeepsakeUrl(supabase, profile?.keepsake_path ?? null)}
+          caption={profile?.keepsake_caption ?? null}
+        />
+      </Card>
 
       <Card title="What he calls you" intro="Optional. Change or remove it any time.">
         <DisplayNameForm current={profile?.display_name ?? null} />
@@ -137,7 +149,7 @@ async function SettingsContent() {
         </form>
       </Card>
 
-      <Card title="Your data" intro="Download everything Fatherly Friend stores about you: profile, memory notes, plans and reflections.">
+      <Card title="Your data" intro="Download everything Fatherly Friend stores about you: profile, memory notes, plans and reflections. Your keepsake photo, if you added one, is shown above; save it from there.">
         <a href="/api/account/export" className="inline-block rounded-full border border-line px-5 py-2.5 text-sm text-cream transition hover:border-brass/60">
           Download my data
         </a>

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { CheckinNote } from "@/lib/checkins";
+import type { CompanionView } from "@/lib/companion/options";
 import type { SafetyLevel } from "@/lib/safety/classifier";
 import { markCheckinSeen } from "./actions";
 import { TextChat } from "./text-chat";
@@ -16,6 +17,7 @@ export function Conversation({
   memoryEnabled,
   resources,
   checkin,
+  companion,
 }: {
   displayName: string | null;
   voiceConfigured: boolean;
@@ -23,6 +25,7 @@ export function Conversation({
   memoryEnabled: boolean;
   resources: React.ReactNode;
   checkin: CheckinNote | null;
+  companion: CompanionView;
 }) {
   const [mode, setMode] = useState<Mode>(voiceConfigured || !aiConfigured ? "voice" : "text");
   const [safety, setSafety] = useState<SafetyLevel>("none");
@@ -93,7 +96,7 @@ export function Conversation({
 
       {/* Both stay mounted so switching tabs doesn't drop a call or the chat. */}
       <div hidden={mode !== "voice"} className="flex-1">
-        <VoicePanel configured={voiceConfigured} displayName={displayName} />
+        <VoicePanel configured={voiceConfigured} displayName={displayName} companion={companion} />
       </div>
       <div hidden={mode !== "text"} className="flex-1">
         <TextChat

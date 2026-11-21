@@ -39,7 +39,9 @@ every **Blocker** is resolved.
 - [ ] Rate limiting and per-user quotas on chat and voice endpoints.
 - [ ] Hosted Supabase: custom SMTP, production redirect URLs, auth rate limits, backups,
       point-in-time recovery decision.
-- [ ] Security headers and CSP.
+- [ ] Security headers and CSP (allow the Supabase Storage host for keepsake images).
+- [ ] Decide whether keepsake uploads need automated content screening (they are visible only
+      to the uploader today).
 - [ ] Dependency and secret scanning in CI.
 - [ ] Verify encryption at rest on the chosen Supabase plan; decide on application-level
       encryption for memory notes.
@@ -51,4 +53,6 @@ every **Blocker** is resolved.
 - [ ] Voice tested live with your Retell agent: latency, interruption, pause, end, voice choice.
 - [ ] Magic link, password sign-up, confirmation and reset tested end to end against
       local and hosted Supabase.
+- [ ] Keepsake photo upload, display and deletion tested against real Supabase Storage
+      (local and hosted), including large phone photos and HEIC files from iPhones.
 - [ ] Accessibility pass (keyboard, screen reader, contrast).
