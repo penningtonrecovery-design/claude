@@ -12,11 +12,13 @@ every **Blocker** is resolved.
       tailoring instructions (`src/lib/growth/tailor.ts`) and the reflection questions and
       scale labels (`src/lib/growth/reflection.ts`), and the check-in notes (`src/lib/checkins.ts`).
 - [ ] Re-verify every crisis resource (numbers, hours, wording) in `src/lib/safety/resources.ts`.
-- [ ] Evaluate the safety classifier on a reviewed test set, including indirect language,
-      slang, sarcasm and past-tense disclosures. Measure misses and over-triggers.
+- [x] Build a labelled test set and scorecard for the safety screen (`docs/safety/`).
+- [ ] Clinician review of the test set labels (`src/lib/safety/eval/cases.ts`).
+- [ ] Decide on a model-based risk check: the keyword screen caught only 1–4 of 20 fresh
+      indirect crisis messages (see `docs/safety/README.md`).
+- [ ] Run `npm run redteam` with the production model and review every fail/concern.
 - [ ] Safety handling for **voice** (currently prompt-only; see docs/RETELL_SETUP.md).
-- [ ] Red-team the model for unsafe advice, dependency-building, impersonation, and
-      pressure to disclose trauma.
+- [x] Red-team script for unsafe advice, dependency, impersonation, trauma pressure (`npm run redteam`).
 - [ ] Decide escalation policy for abuse disclosures involving children (mandatory-reporting
       questions are legal, not technical).
 - [ ] Professional review of the psychological knowledge base before it is used. Verify

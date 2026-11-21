@@ -104,3 +104,13 @@
 **Decision:** Upgrade `next` and `eslint-config-next` from 16.4.3 to 16.4.6 (patch release).
 **Reasoning:** npm's advisory database lists seven moderate advisories for Next.js 16.0–16.4.4, several in Cache Components, which this app uses, and Next refused to build until patched. The remaining audit findings are in `minimatch`, used only by development linting tools.
 **Context:** Found while building the visual companion. Applied with a plain `npm install`; all tests and the build pass on 16.4.6.
+
+## 2026-11-21 — Safety evaluation: labelled test set, scorecard gate, and a red-team script
+**Decision:** Add a labelled test set of user messages (each with an ideal level and the levels that are acceptable) and a scorecard that runs with the normal tests. Zero missed crisis messages and zero ordinary messages escalated to crisis are hard gates; the full results are written to `docs/safety/SCORECARD.md`. Add `npm run redteam`, which sends tricky prompts through the real chat pipeline (screen, moderation, persona, model), checks replies with fixed rules and an automated judge, and writes `docs/safety/REDTEAM_REPORT.md`.
+**Reasoning:** The keyword screen needs measurable recall and false-alarm rates, and a regression gate so future edits cannot silently weaken it. The red-team covers what the screen cannot: how the model itself behaves. It runs on the owner's machine because the OpenAI key is not in this workspace.
+**Context:** User chose "test set and red-team script" over adding a key here. The test set and the automated judge are starting points; both need clinician review and do not replace it.
+
+## 2026-11-21 — Keyword screen is a floor, not the main safeguard (finding; next step pending)
+**Decision:** Keep the widened keyword screen as a deterministic floor and regression gate, and record the indirect crisis phrasings it still misses as known gaps rather than tuning a rule to each sentence. Recommend adding a model-based risk check before each reply; the owner decides whether to build it.
+**Reasoning:** On fresh messages not used for tuning, the screen caught 1 of 20 and then 4 of 20 indirect crisis messages. Rules tuned to a test set score perfectly on it and still miss new phrasings, so a perfect scorecard would give false confidence.
+**Context:** Results in docs/safety/README.md and SCORECARD.md. The red-team (`npm run redteam`) measures how much OpenAI moderation and the model itself add, and needs the owner's key.

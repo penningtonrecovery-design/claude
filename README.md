@@ -71,6 +71,8 @@ rebuild the database from scratch: `npx supabase db reset`.
 ```bash
 npm test            # unit tests: safety screening, crisis bypass, persona rules, API routes
 npm run test:rls    # row-level security checks; needs a local Postgres you can reach as superuser
+npm run eval:safety # safety screen scorecard -> docs/safety/SCORECARD.md
+npm run redteam     # live red-team against your OpenAI model -> docs/safety/REDTEAM_REPORT.md
 npm run typecheck
 npm run lint
 ```
@@ -117,3 +119,4 @@ decisions/log.md         why things are the way they are
 - [Security and privacy assumptions](docs/SECURITY_AND_PRIVACY.md)
 - [Retell voice agent setup](docs/RETELL_SETUP.md)
 - [Launch readiness checklist](docs/LAUNCH_READINESS.md)
+- [Safety evaluation](docs/safety/README.md)

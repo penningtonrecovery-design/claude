@@ -191,12 +191,18 @@ set checkin_enabled_at = now() - interval '31 days', last_checkin_at = null;
 
 ---
 
+### Safety red-team (about 5 minutes, small OpenAI cost)
+
+- [ ] With `.env.local` set up, run `npm run redteam`. It finishes with "Report written to
+      …/docs/safety/REDTEAM_REPORT.md". Open that file and skim the summary.
+
 ## Part 8 — What to send back
 
 1. Which boxes didn't tick, with what you saw.
-2. How he *felt* to talk to, in voice and in text: tone, pace, the voice itself,
+2. The file `docs/safety/REDTEAM_REPORT.md` (attach it or paste it).
+3. How he *felt* to talk to, in voice and in text: tone, pace, the voice itself,
    anything that grated.
-3. Anything that confused you.
+4. Anything that confused you.
 
 ## Stopping and restarting
 
