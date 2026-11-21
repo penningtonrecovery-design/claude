@@ -1,10 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
+import path from "node:path";
 import sharp from "sharp";
 import { describe, expect, it } from "vitest";
 import { AvatarPortrait } from "@/components/avatar-portrait";
 import {
   AVATARS,
+  avatarImagePath,
   DEFAULT_AVATAR,
   keepsakePath,
   parseCompanionChoice,
@@ -20,7 +22,7 @@ describe("companion options", () => {
   it.each([
     ["voice", { mode: "voice", avatar: null }],
     ["photo", { mode: "photo", avatar: null }],
-    ["avatar:flatcap", { mode: "avatar", avatar: "flatcap" }],
+    ["avatar:south-asian", { mode: "avatar", avatar: "south-asian" }],
     ["avatar:unknown", { mode: "avatar", avatar: DEFAULT_AVATAR }],
   ])("parses %s", (choice, expected) => {
     expect(parseCompanionChoice(choice)).toEqual(expected);
@@ -51,11 +53,28 @@ describe("companion options", () => {
 });
 
 describe("avatar portraits", () => {
-  it.each(AVATARS.map((a) => a.id))("%s renders as a labelled, clipped illustration", (id) => {
-    const html = renderToStaticMarkup(createElement(AvatarPortrait, { id, title: "Test" }));
-    expect(html).toContain("<svg");
-    expect(html).toContain('aria-label="Test"');
-    expect(html).toContain(`clip-${id}`);
+  it.each(AVATARS.map((a) => a.id))("%s has a square portrait file", async (id) => {
+    const meta = await sharp(path.join(process.cwd(), "public", avatarImagePath(id))).metadata();
+    expect(meta.format).toBe("webp");
+    expect(meta.width).toBe(meta.height);
+    expect(meta.width).toBeGreaterThanOrEqual(400);
+    expect(meta.exif).toBeUndefined();
+  });
+
+  it.each(AVATARS.map((a) => a.id))("%s renders as an image that says it is AI-generated", (id) => {
+    const html = renderToStaticMarkup(createElement(AvatarPortrait, { id }));
+    expect(html).toContain("<img");
+    expect(html).toContain(encodeURIComponent(avatarImagePath(id)));
+    expect(html).toMatch(/alt="[^"]*AI-generated[^"]*not a real person"/);
+  });
+
+  it("uses a given title as the alt text", () => {
+    const html = renderToStaticMarkup(createElement(AvatarPortrait, { id: "white", title: "Test" }));
+    expect(html).toContain('alt="Test"');
+  });
+
+  it("lists each background once", () => {
+    expect(new Set(AVATARS.map((a) => a.background)).size).toBe(AVATARS.length);
   });
 });
 

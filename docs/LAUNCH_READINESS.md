@@ -46,6 +46,8 @@ every **Blocker** is resolved.
 - [ ] Hosted Supabase: custom SMTP, production redirect URLs, auth rate limits, backups,
       point-in-time recovery decision.
 - [ ] Security headers and CSP (allow the Supabase Storage host for keepsake images).
+- [ ] Confirm the image generator's terms allow commercial use of the grandfather portraits
+      (`public/companions/`, made with ElevenLabs), and keep a record of how they were made.
 - [ ] Decide whether keepsake uploads need automated content screening (they are visible only
       to the uploader today).
 - [ ] Dependency and secret scanning in CI.

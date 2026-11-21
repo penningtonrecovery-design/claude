@@ -4,16 +4,28 @@
 export const COMPANION_MODES = ["voice", "avatar", "photo"] as const;
 export type CompanionMode = (typeof COMPANION_MODES)[number];
 
+// AI-generated portraits of grandfathers who don't exist (no real person's
+// likeness). Files live in public/companions/<id>.webp. Listed alphabetically
+// by background so no one comes "first".
 export const AVATARS = [
-  { id: "cardigan", name: "The Cardigan", description: "Silver beard, warm cardigan, a listener's face." },
-  { id: "flatcap", name: "The Flat Cap", description: "Glasses, flat cap, a craftsman's patience." },
-  { id: "silverfox", name: "The Silver Fox", description: "Neat white hair, an easy, knowing smile." },
-  { id: "warmsmile", name: "The Warm Smile", description: "Close-cropped grey hair, kind eyes, steady." },
+  { id: "black", background: "Black / African American", name: "The Cardigan", description: "Silver beard, warm cardigan, a listener's face." },
+  { id: "east-asian", background: "East Asian", name: "The Warm Smile", description: "Close-cropped grey hair, kind eyes, steady." },
+  { id: "latino", background: "Hispanic / Latino", name: "The Silver Fox", description: "Neat white hair, an easy, knowing smile." },
+  { id: "south-asian", background: "South Asian", name: "The Sweater Vest", description: "Swept-back white hair, a wise, gentle smile." },
+  { id: "white", background: "White", name: "The Flat Cap", description: "Glasses, flat cap, a craftsman's patience." },
 ] as const;
 
 export type AvatarId = (typeof AVATARS)[number]["id"];
 
-export const DEFAULT_AVATAR: AvatarId = "cardigan";
+export const DEFAULT_AVATAR: AvatarId = "black";
+
+export function avatarImagePath(id: AvatarId): string {
+  return `/companions/${id}.webp`;
+}
+
+export function avatarInfo(id: AvatarId) {
+  return AVATARS.find((a) => a.id === id) ?? AVATARS[0];
+}
 
 export const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 export const ACCEPTED_UPLOAD_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;

@@ -30,7 +30,7 @@ companion, safety evaluation, a reviewed knowledge base, and personalization).
 | Monthly reflections (1–5 per area, optional words, history, in-app reminder with snooze) | Working |
 | Check-ins (opt-in, in-app only, pre-written notes; weekly / two-weekly / monthly) | Working |
 | "Remember this" on his own chat messages (memory on; edit before saving; crisis text refused) | Working |
-| How he appears: voice-only, four illustrated grandfathers, or a private keepsake photo beside him | Working; photo storage tested against a stand-in, not real Supabase Storage yet |
+| How he appears: voice-only, five AI-generated grandfather portraits (one per background), or a private keepsake photo beside him | Working; photo storage tested against a stand-in, not real Supabase Storage yet |
 | How he talks with you: tone, focus, next steps, topics to avoid, faith, life context | Working (text and voice) |
 | "Tune how he talks to me": AI-suggested style changes he accepts or skips | Built and unit-tested; **not yet verified against the live OpenAI API** |
 | Research knowledge base with review workflow (12 draft entries) | Working; **no entry approved yet, so the AI doesn't use it** until a clinician reviews |

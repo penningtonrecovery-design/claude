@@ -138,7 +138,7 @@ export function VoicePanel({
               className="absolute inset-0 rounded-full ring-2 ring-brass/40 transition-transform duration-100"
               style={{ transform: "scale(calc(1 + var(--level) * 0.06))" }}
             >
-              <AvatarPortrait id={companion.avatarId} className="h-full w-full" />
+              <AvatarPortrait id={companion.avatarId} className="h-full w-full" priority />
             </div>
           ) : (
             <>

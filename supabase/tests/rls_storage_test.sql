@@ -16,6 +16,12 @@ do $$ begin
   if (select pref_faith from public.profiles where id = '55555555-5555-5555-5555-555555555555') <> 'off' then
     raise exception 'FAIL: faith preference must default to off';
   end if;
+  update public.profiles set avatar_id = 'south-asian' where id = '55555555-5555-5555-5555-555555555555';
+  begin
+    update public.profiles set avatar_id = 'cardigan' where id = '55555555-5555-5555-5555-555555555555';
+    raise exception 'FAIL: retired illustration id accepted';
+  exception when check_violation then null;
+  end;
   begin
     update public.profiles set pref_avoid_topics = array['anything goes'] where id = '55555555-5555-5555-5555-555555555555';
     raise exception 'FAIL: free-text avoid topic accepted';

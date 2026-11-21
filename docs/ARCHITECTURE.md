@@ -91,8 +91,11 @@ Friend's next message; **Thanks** dismisses it. Both record `last_checkin_at`. N
 sent outside the app, and no AI writes the notes.
 
 ### Visual companion (Phase 3)
-Settings → "How he appears": voice-only (the orb), one of four illustrated grandfathers
-(`src/components/avatar-portrait.tsx`, inline SVG that glows with the voice), or "Your photo".
+Settings → "How he appears": voice-only (the orb), one of five AI-generated grandfather
+portraits, one per background (Black / African American, East Asian, Hispanic / Latino,
+South Asian, White), or "Your photo". The portraits are static files in `public/companions/`
+showing people who don't exist; `src/components/avatar-portrait.tsx` shows them in a circle
+that glows and swells slightly with the voice, and Settings says they are AI-generated.
 The keepsake photo flow:
 1. The browser shrinks the image to at most 1600 px and sends it to the `uploadKeepsake`
    server action (body limit 4.4 MB, under Vercel's 4.5 MB).

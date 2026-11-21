@@ -171,7 +171,7 @@ set checkin_enabled_at = now() - interval '31 days', last_checkin_at = null;
 
 ### How he appears
 
-- [ ] Settings → "How he appears" → pick an illustrated grandfather → Save → Talk shows him,
+- [ ] Settings → "How he appears" → pick a grandfather portrait → Save → Talk shows him,
       with "Fatherly Friend is an AI" underneath. During a voice call he glows as he speaks.
 - [ ] Settings → add a photo (try one straight from your phone) with a caption → Talk shows
       it framed beside the orb. Remove it → it's gone from Talk and Settings.
