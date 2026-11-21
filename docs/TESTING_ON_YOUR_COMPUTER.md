@@ -176,6 +176,15 @@ set checkin_enabled_at = now() - interval '31 days', last_checkin_at = null;
 - [ ] Settings → add a photo (try one straight from your phone) with a caption → Talk shows
       it framed beside the orb. Remove it → it's gone from Talk and Settings.
 
+### How he talks with you
+
+- [ ] Settings → "How he talks with you" → choose "Straight-talking" and "Practical advice",
+      tick a topic to avoid → Save → in Type, his replies should feel more direct and
+      practical, and he shouldn't raise that topic.
+- [ ] Have a normal conversation of 4+ messages in Type → "Tune how he talks to me" →
+      suggestions appear with reasons → Accept one → it shows in Settings.
+- [ ] In Retell, add the `{{preferences}}` line (docs/RETELL_SETUP.md) → voice follows them too.
+
 ### Your data
 
 - [ ] Settings → "Download my data" → a file downloads with your profile, memories,

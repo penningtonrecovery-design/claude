@@ -4,6 +4,7 @@ import { respond } from "@/lib/chat/respond";
 import { chatRequestSchema } from "@/lib/chat/validation";
 import { getAiConfig } from "@/lib/config";
 import { isTopic, LIBRARY } from "@/lib/growth/library";
+import { preferencesFromProfile, renderPreferences } from "@/lib/personalization/preferences";
 import { moderateWithOpenAI } from "@/lib/safety/moderation";
 import { getCurrentUser } from "@/lib/supabase/server";
 
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, memory_enabled")
+    .select("display_name, memory_enabled, pref_tone, pref_focus, pref_next_steps, pref_faith, pref_avoid_topics, life_context")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -59,6 +60,9 @@ export async function POST(request: NextRequest) {
       displayName: profile?.display_name,
       memories,
       plans,
+      preferences: renderPreferences(preferencesFromProfile(profile), {
+        includeLifeContext: Boolean(profile?.memory_enabled),
+      }),
     });
 
     if (outcome.kind === "not_configured") {

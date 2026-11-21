@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition, type FormEvent, type Keyboa
 import { MEMORY_CATEGORIES, MAX_MEMORY_CHARS, prefillFromMessage } from "@/lib/memory/save";
 import type { SafetyLevel } from "@/lib/safety/classifier";
 import { rememberFromChat } from "./actions";
+import { TuneSuggestions } from "./tune-suggestions";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -119,6 +120,8 @@ export function TextChat({
         {pending && <p className="font-serif text-lg text-dust">…</p>}
         <div ref={endRef} />
       </div>
+
+      <TuneSuggestions messages={messages} configured={configured} />
 
       {notice && (
         <p role="status" className="mx-4 mb-3 rounded-xl border border-line bg-ink-2 px-4 py-3 text-sm text-sand sm:mx-6">

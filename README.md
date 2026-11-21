@@ -7,8 +7,8 @@ at a time, offers practical wisdom, and is honest that he's an AI and not a ther
 This repository holds the **Phase 1 foundation** (landing page, sign-in, onboarding, a
 private conversation screen with voice and text, consent-based memory notes, data export and
 deletion, essential safety handling) and the **Phase 2 core loop** (growth plans, progress
-tracking, monthly reflections, in-app check-ins, "Remember this" memory), and the start of
-**Phase 3** (the visual companion).
+tracking, monthly reflections, in-app check-ins, "Remember this" memory), and **Phase 3** (the visual
+companion, safety evaluation, a reviewed knowledge base, and personalization).
 
 > **Not ready for the public.** The psychological guidance, safety wording and crisis
 > resources need qualified professional review first. See
@@ -31,6 +31,10 @@ tracking, monthly reflections, in-app check-ins, "Remember this" memory), and th
 | Check-ins (opt-in, in-app only, pre-written notes; weekly / two-weekly / monthly) | Working |
 | "Remember this" on his own chat messages (memory on; edit before saving; crisis text refused) | Working |
 | How he appears: voice-only, four illustrated grandfathers, or a private keepsake photo beside him | Working; photo storage tested against a stand-in, not real Supabase Storage yet |
+| How he talks with you: tone, focus, next steps, topics to avoid, faith, life context | Working (text and voice) |
+| "Tune how he talks to me": AI-suggested style changes he accepts or skips | Built and unit-tested; **not yet verified against the live OpenAI API** |
+| Research knowledge base with review workflow (12 draft entries) | Working; **no entry approved yet, so the AI doesn't use it** until a clinician reviews |
+| Safety evaluation: scorecard gate and red-team script | Working; red-team not yet run live |
 | Row-level security (each user sees only their own data) | Tested against Postgres |
 
 Without keys, the app says plainly that voice or text isn't configured, rather than
@@ -105,6 +109,8 @@ src/lib/
   checkins.ts            check-in note library and schedule
   memory/                memory validation shared by Settings and "Remember this"
   companion/             appearance options, keepsake photo processing and signed links
+  knowledge/             reviewed guidance library and how entries are selected
+  personalization/       style preferences and AI-suggested changes
   supabase/              server, browser and proxy clients
 src/proxy.ts             session refresh + private-page guard (Next 16's "middleware")
 supabase/migrations/     database schema and row-level security
@@ -120,3 +126,4 @@ decisions/log.md         why things are the way they are
 - [Retell voice agent setup](docs/RETELL_SETUP.md)
 - [Launch readiness checklist](docs/LAUNCH_READINESS.md)
 - [Safety evaluation](docs/safety/README.md)
+- [Reviewing the knowledge base](docs/knowledge/REVIEW.md)

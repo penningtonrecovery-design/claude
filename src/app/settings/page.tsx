@@ -8,6 +8,8 @@ import { deleteAllMemories, deleteMemory, setMemoryEnabled } from "./actions";
 import { isCheckinFrequency } from "@/lib/checkins";
 import { AddMemoryForm, CheckinForm, DeleteAccountForm, DisplayNameForm } from "./forms";
 import { CompanionSettings } from "./companion-settings";
+import { PreferencesForm } from "./preferences-form";
+import { preferencesFromProfile } from "@/lib/personalization/preferences";
 import { signKeepsakeUrl } from "@/lib/companion/keepsake";
 import { DEFAULT_AVATAR, isAvatarId, isCompanionMode } from "@/lib/companion/options";
 
@@ -50,7 +52,7 @@ async function SettingsContent() {
   if (!supabase || !user) redirect("/login?next=/settings");
 
   const [{ data: profile }, { data: memories }] = await Promise.all([
-    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency, companion_mode, avatar_id, keepsake_path, keepsake_caption").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("display_name, memory_enabled, reflection_prompts_enabled, checkin_frequency, companion_mode, avatar_id, keepsake_path, keepsake_caption, pref_tone, pref_focus, pref_next_steps, pref_faith, pref_avoid_topics, life_context").eq("id", user.id).maybeSingle(),
     supabase.from("memories").select("id, category, content, source, created_at").order("created_at", { ascending: false }),
   ]);
   const memoryOn = Boolean(profile?.memory_enabled);
@@ -67,6 +69,10 @@ async function SettingsContent() {
           photoUrl={await signKeepsakeUrl(supabase, profile?.keepsake_path ?? null)}
           caption={profile?.keepsake_caption ?? null}
         />
+      </Card>
+
+      <Card title="How he talks with you" intro="Tell him what works for you. Everything here is optional, and you can change it any time.">
+        <PreferencesForm prefs={preferencesFromProfile(profile)} memoryOn={Boolean(profile?.memory_enabled)} />
       </Card>
 
       <Card title="What he calls you" intro="Optional. Change or remove it any time.">

@@ -44,6 +44,9 @@ export type PromptContext = {
   displayName?: string | null;
   memories?: { category: string; content: string }[];
   plans?: { topic: string; focus: string | null; openSteps: string[] }[];
+  // Already-rendered sections from personalization and the knowledge base.
+  preferences?: string | null;
+  knowledge?: string | null;
   safetyInstructions?: string | null;
 };
 
@@ -52,6 +55,10 @@ export function buildSystemPrompt(context: PromptContext = {}): string {
 
   if (context.displayName) {
     parts.push(`He has asked you to call him ${context.displayName}.`);
+  }
+
+  if (context.preferences) {
+    parts.push(context.preferences);
   }
 
   if (context.memories && context.memories.length > 0) {
@@ -80,6 +87,11 @@ export function buildSystemPrompt(context: PromptContext = {}): string {
     );
   }
 
+  if (context.knowledge) {
+    parts.push(context.knowledge);
+  }
+
+  // Safety instructions always come last so nothing above can override them.
   if (context.safetyInstructions) {
     parts.push(context.safetyInstructions);
   }
