@@ -11,6 +11,10 @@ every **Blocker** is resolved.
 - [ ] Clinician review of the growth-plan step library (`src/lib/growth/library.ts`), the
       tailoring instructions (`src/lib/growth/tailor.ts`) and the reflection questions and
       scale labels (`src/lib/growth/reflection.ts`), and the check-in notes (`src/lib/checkins.ts`).
+- [ ] Clinician review of the knowledge-base entries and verification of every citation
+      (`docs/knowledge/REVIEW.md`); verify or drop the brief's unconfirmed sources.
+- [ ] Clinician review of the preference wording (`src/lib/personalization/preferences.ts`)
+      and the suggestion instructions (`src/lib/personalization/suggest.ts`).
 - [ ] Re-verify every crisis resource (numbers, hours, wording) in `src/lib/safety/resources.ts`.
 - [x] Build a labelled test set and scorecard for the safety screen (`docs/safety/`).
 - [ ] Clinician review of the test set labels (`src/lib/safety/eval/cases.ts`).
@@ -38,13 +42,22 @@ every **Blocker** is resolved.
 
 ## Security (Blockers)
 
-- [ ] Rate limiting and per-user quotas on chat and voice endpoints.
+- [x] Rate limiting and per-user quotas on chat, voice, tailoring, suggestions, uploads and
+      exports (`consume_rate_limit`; limits in docs/SECURITY_AND_PRIVACY.md).
+- [ ] Set the 30-minute maximum call duration on the Retell agent (docs/RETELL_SETUP.md).
+- [ ] Set monthly spending caps in the OpenAI and Retell dashboards.
 - [ ] Hosted Supabase: custom SMTP, production redirect URLs, auth rate limits, backups,
       point-in-time recovery decision.
-- [ ] Security headers and CSP (allow the Supabase Storage host for keepsake images).
+- [x] Security headers and content security policy (`src/lib/security-headers.ts`).
+- [ ] Confirm a real voice call works under the content security policy (browser console
+      shows no "Content Security Policy" errors during a call).
+- [ ] Confirm the image generator's terms allow commercial use of the grandfather portraits
+      (`public/companions/`, made with ElevenLabs), and keep a record of how they were made.
 - [ ] Decide whether keepsake uploads need automated content screening (they are visible only
       to the uploader today).
-- [ ] Dependency and secret scanning in CI.
+- [x] Dependency and secret scanning in CI (`.github/workflows/ci.yml`, `.github/dependabot.yml`).
+- [ ] In GitHub Settings → Code security, turn on Dependabot alerts and Dependabot security
+      updates; in Settings → Branches, require the CI checks to pass before merging.
 - [ ] Verify encryption at rest on the chosen Supabase plan; decide on application-level
       encryption for memory notes.
 

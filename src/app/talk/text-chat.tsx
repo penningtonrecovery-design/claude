@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition, type FormEvent, type Keyboa
 import { MEMORY_CATEGORIES, MAX_MEMORY_CHARS, prefillFromMessage } from "@/lib/memory/save";
 import type { SafetyLevel } from "@/lib/safety/classifier";
 import { rememberFromChat } from "./actions";
+import { TuneSuggestions } from "./tune-suggestions";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -72,6 +73,10 @@ export function TextChat({
       if (res.ok && data.reply) {
         setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
         setNotice(null);
+      } else if (res.status === 429 && typeof data.message === "string") {
+        setNotice(data.message);
+        setMessages((m) => m.slice(0, -1));
+        setDraft(content);
       } else if (res.status === 503) {
         setNotice("Text replies aren't configured on this server yet, so he can't answer this one.");
       } else if (res.status === 401) {
@@ -119,6 +124,8 @@ export function TextChat({
         {pending && <p className="font-serif text-lg text-dust">…</p>}
         <div ref={endRef} />
       </div>
+
+      <TuneSuggestions messages={messages} configured={configured} />
 
       {notice && (
         <p role="status" className="mx-4 mb-3 rounded-xl border border-line bg-ink-2 px-4 py-3 text-sm text-sand sm:mx-6">

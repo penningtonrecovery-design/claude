@@ -11,6 +11,9 @@ What this build does, what it relies on, and what it doesn't do yet.
 | Memory notes (opt-in) | `public.memories` | Only what he writes in Settings or explicitly saves from his own chat message; crisis-level text is refused; deletable individually or all at once |
 | Growth plans, steps, step notes | `public.growth_plans`, `public.plan_steps` | Open steps reach the model only with memory on; focus text is sent to OpenAI only when he asks for tailoring |
 | Keepsake photo (optional) and caption | Supabase Storage bucket `keepsakes` (private); caption in `profiles` | Re-encoded server-side (metadata incl. GPS removed); own-folder access only; served by 1-hour signed links; never sent to AI or voice providers; deleted on removal and on account deletion |
+| Style preferences and life context | `public.profiles` | Fixed vocabularies only (database-checked); life context reaches the AI only with memory on; style preferences also sent to Retell at call start |
+| "Tune how he talks to me" | Not stored | The in-browser conversation is sent once to OpenAI when he taps the button; suggestions apply only when he accepts |
+| Usage counters | `public.rate_limits` | Counts of messages, calls and AI requests per minute and per day; no content. Users can't read or change them; old windows are deleted as they expire; removed with the account |
 | Monthly reflections | `public.reflections` | Never sent to the model; can't be edited, only deleted |
 | Text conversation | **Not stored by the app** | Lives in the browser tab only. Sent to OpenAI per message |
 | Voice audio and transcripts | Retell AI | Depends on the agent's data-storage setting. **Must be configured and documented before launch** |
@@ -28,6 +31,25 @@ What this build does, what it relies on, and what it doesn't do yet.
   itself (the browser can't choose the agent), and doesn't pass Retell's error bodies back.
 - **Input validation** on all API routes and server actions (zod): roles limited to
   user/assistant (no injected system messages), length and count limits.
+- **Per-user rate limits** on text chat (10 a minute, 200 a day), voice calls (3 a minute,
+  10 a day), plan tailoring (3 / 10), style suggestions (2 / 5), photo uploads (3 / 10) and
+  data downloads (2 / 5). The limits live inside the database function
+  `consume_rate_limit`, so a caller can't choose its own. A crisis message is screened
+  first and always gets the fixed crisis reply, even over the limit. If the check itself
+  fails, the request is allowed and a warning is logged. Voice call length is capped in
+  Retell's agent settings (30 minutes; see RETELL_SETUP.md).
+- **Security headers** on every response (`src/lib/security-headers.ts`, applied in
+  `next.config.ts`): a content security policy that loads scripts, styles and fonts only
+  from the site itself, lets the page talk only to Supabase, Retell and Retell's LiveKit
+  media servers, and forbids framing, plugins and off-site form posts; plus HSTS,
+  `nosniff`, `X-Frame-Options: DENY`, a strict referrer policy, and a permissions policy
+  that allows the microphone for this site only. Scripts still allow inline code because
+  Next.js needs it without per-request nonces; zod's eval probe is switched off
+  (`src/lib/zod.ts`) so it doesn't trip the policy.
+- **Automated checks** on every pull request (`.github/workflows/ci.yml`): lint, types,
+  tests, the database security tests against Postgres, the production build, a gitleaks
+  scan of the full history for leaked keys, and `npm audit` failing on high or critical
+  vulnerabilities. Dependabot opens grouped security-fix pull requests weekly.
 - **Open-redirect protection** on sign-in callbacks.
 - **Data minimisation:** no transcript storage, memory off by default, OpenAI `store: false`,
   name is optional and is the only profile detail shared with Retell.
@@ -47,9 +69,11 @@ What this build does, what it relies on, and what it doesn't do yet.
 
 ## Not done yet (tracked in LAUNCH_READINESS.md)
 
-- Rate limiting on `/api/chat`, `/api/plans/tailor` and `/api/voice/web-call` (cost and abuse control).
+- Limits across all users combined (a spending ceiling) and per-IP limits; set a monthly
+  budget cap in the OpenAI and Retell dashboards as a backstop.
 - Application-level encryption for memory notes.
-- Security headers / Content-Security-Policy review.
+- A nonce-based content security policy (would remove 'unsafe-inline' for scripts, at the
+  cost of rendering every page per request).
 - Retell data-storage configuration and privacy-page wording for voice.
 - Audit logging for account deletion and exports (without content).
 - Real-time safety screening for voice conversations.

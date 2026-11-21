@@ -96,8 +96,8 @@ describe("setCompanionMode", () => {
   it("saves an avatar choice", async () => {
     getCurrentUser.mockResolvedValue({ supabase: fakeSupabase(), user: { id: "u1" } });
     const fd = new FormData();
-    fd.set("choice", "avatar:silverfox");
+    fd.set("choice", "avatar:latino");
     expect(await setCompanionMode(undefined, fd)).toEqual({ ok: "Saved." });
-    expect(update.mock.calls[0][0]).toEqual({ companion_mode: "avatar", avatar_id: "silverfox" });
+    expect(update.mock.calls[0][0]).toEqual({ companion_mode: "avatar", avatar_id: "latino" });
   });
 });

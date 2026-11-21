@@ -68,12 +68,12 @@ Open `.env.local` in any text editor and fill in:
 
 ## Part 5 — Set up the Retell voice agent
 
-Follow [RETELL_SETUP.md](RETELL_SETUP.md), sections 1–4. Short version:
+Follow [RETELL_SETUP.md](RETELL_SETUP.md), sections 1–5. Short version:
 
 1. Run `npm run voice-prompt` and copy everything it prints.
 2. In Retell, create an agent, paste that as its prompt, and add the `{{user_name}}` line
    from RETELL_SETUP.md.
-3. Choose a warm, mature male voice.
+3. Choose a warm, mature male voice, and set the maximum call duration to 30 minutes.
 4. Copy the agent's ID into `RETELL_AGENT_ID` in `.env.local`.
 
 - [ ] Agent created and ID saved.
@@ -116,6 +116,8 @@ Sign-in emails go to a local test inbox, not your real email: <http://127.0.0.1:
 ### Talking (voice)
 
 - [ ] "Talk" tab → "Start talking" → allow the microphone → you hear his opening line.
+      If it fails to connect, open the browser's developer tools (right-click → Inspect →
+      Console) and send Claude any red line that mentions "Content Security Policy".
 - [ ] He uses your name if you gave one.
 - [ ] Interrupt him mid-sentence: he stops and listens.
 - [ ] "Pause" mutes you; "Resume" un-mutes; "End conversation" ends it.
@@ -171,10 +173,27 @@ set checkin_enabled_at = now() - interval '31 days', last_checkin_at = null;
 
 ### How he appears
 
-- [ ] Settings → "How he appears" → pick an illustrated grandfather → Save → Talk shows him,
+- [ ] Settings → "How he appears" → pick a grandfather portrait → Save → Talk shows him,
       with "Fatherly Friend is an AI" underneath. During a voice call he glows as he speaks.
 - [ ] Settings → add a photo (try one straight from your phone) with a caption → Talk shows
       it framed beside the orb. Remove it → it's gone from Talk and Settings.
+
+### How he talks with you
+
+- [ ] Settings → "How he talks with you" → choose "Straight-talking" and "Practical advice",
+      tick a topic to avoid → Save → in Type, his replies should feel more direct and
+      practical, and he shouldn't raise that topic.
+- [ ] Have a normal conversation of 4+ messages in Type → "Tune how he talks to me" →
+      suggestions appear with reasons → Accept one → it shows in Settings.
+- [ ] In Retell, add the `{{preferences}}` line (docs/RETELL_SETUP.md) → voice follows them too.
+
+### Limits
+
+- [ ] In Type, send 11 short messages within a minute (e.g. "test 1", "test 2"…). The 11th
+      shows a calm note saying you can carry on in a minute, and your message stays in the
+      box. After a minute, sending works again.
+- [ ] Right after that, type `I don't want to be alive anymore`. You still get the fixed
+      crisis reply with 988 and 911: the limit never blocks it.
 
 ### Your data
 

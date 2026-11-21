@@ -1,4 +1,7 @@
 import type { ChatMessage, ChatProvider } from "@/lib/ai/types";
+import { renderKnowledge, selectKnowledge } from "@/lib/knowledge/select";
+import type { RateLimitResult } from "@/lib/rate-limit";
+import type { KnowledgeEntry } from "@/lib/knowledge/types";
 import { buildSystemPrompt } from "@/lib/persona/system-prompt";
 import {
   classifyMessage,
@@ -14,7 +17,8 @@ import {
 
 export type ChatOutcome =
   | { kind: "reply"; reply: string; safety: SafetyLevel; source: "model" | "safety" }
-  | { kind: "not_configured"; safety: SafetyLevel };
+  | { kind: "not_configured"; safety: SafetyLevel }
+  | { kind: "rate_limited"; safety: SafetyLevel; limit: Extract<RateLimitResult, { allowed: false }> };
 
 export type RespondDeps = {
   provider: ChatProvider | null;
@@ -22,6 +26,12 @@ export type RespondDeps = {
   displayName?: string | null;
   memories?: { category: string; content: string }[];
   plans?: { topic: string; focus: string | null; openSteps: string[] }[];
+  preferences?: string | null;
+  // Defaults to the approved entries in the repository's knowledge base.
+  knowledgeEntries?: KnowledgeEntry[];
+  // Counts one model reply against his limits. Called only after screening,
+  // so a crisis message is always answered, even over the limit.
+  checkLimit?: () => Promise<RateLimitResult>;
 };
 
 // Screens the latest message, then either returns a fixed crisis response or
@@ -52,10 +62,22 @@ export async function respond(
     return { kind: "not_configured", safety: safety.level };
   }
 
+  if (deps.checkLimit) {
+    const limit = await deps.checkLimit();
+    if (!limit.allowed) return { kind: "rate_limited", safety: safety.level, limit };
+  }
+
   const system = buildSystemPrompt({
     displayName: deps.displayName,
     memories: deps.memories,
     plans: deps.plans,
+    preferences: deps.preferences,
+    knowledge: renderKnowledge(
+      selectKnowledge(
+        messages.filter((m) => m.role === "user").slice(-3).map((m) => m.content),
+        deps.knowledgeEntries,
+      ),
+    ),
     safetyInstructions: safetyInstructions(safety.level),
   });
 

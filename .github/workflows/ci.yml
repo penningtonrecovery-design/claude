@@ -1,0 +1,72 @@
+# Checks every pull request: lint, types, tests, database security tests,
+# the production build, a leaked-key scan and a vulnerable-package check.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - name: Database security tests
+        run: npm run test:rls
+        env:
+          PGHOST: localhost
+          PGUSER: postgres
+          # Throwaway database in this job only; not a real credential.
+          PGPASSWORD: postgres
+      - run: npm run build
+
+  security:
+    name: Leaked keys and vulnerable packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: 8.21.2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan the full history for leaked keys (gitleaks)
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar xz gitleaks
+          ./gitleaks git --redact --no-banner --verbose .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Fail on high or critical vulnerabilities
+        run: npm audit --audit-level=high

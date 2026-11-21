@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import type { ChatMessage, ChatProvider } from "@/lib/ai/types";
 
 // An automated reviewer that grades one reply against the brief's rules. It

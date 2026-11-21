@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { MAX_PLAN_STEPS, MAX_STEP_CHARS } from "@/lib/growth/library";
 import { createPlanSchema, type CreatePlanInput } from "@/lib/growth/schemas";
 import { classifyMessage } from "@/lib/safety/classifier";

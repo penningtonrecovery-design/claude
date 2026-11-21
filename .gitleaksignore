@@ -1,0 +1,7 @@
+# Known false positives for the leaked-key scan. Each line is the exact
+# finding's fingerprint, so only that line in that commit is skipped.
+# Check a finding's value is a placeholder before adding it here.
+
+# Earlier project's .env.example: GOOGLE_PRIVATE_KEY holds only "..." between
+# the BEGIN/END markers (a placeholder, not a key).
+be8070d47ea82f70b5cc345988f4abbc6761a5d7:.env.example:private-key:12

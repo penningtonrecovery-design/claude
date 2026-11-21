@@ -91,8 +91,11 @@ Friend's next message; **Thanks** dismisses it. Both record `last_checkin_at`. N
 sent outside the app, and no AI writes the notes.
 
 ### Visual companion (Phase 3)
-Settings → "How he appears": voice-only (the orb), one of four illustrated grandfathers
-(`src/components/avatar-portrait.tsx`, inline SVG that glows with the voice), or "Your photo".
+Settings → "How he appears": voice-only (the orb), one of five AI-generated grandfather
+portraits, one per background (Black / African American, East Asian, Hispanic / Latino,
+South Asian, White), or "Your photo". The portraits are static files in `public/companions/`
+showing people who don't exist; `src/components/avatar-portrait.tsx` shows them in a circle
+that glows and swells slightly with the voice, and Settings says they are AI-generated.
 The keepsake photo flow:
 1. The browser shrinks the image to at most 1600 px and sends it to the `uploadKeepsake`
    server action (body limit 4.4 MB, under Vercel's 4.5 MB).
@@ -107,6 +110,42 @@ The keepsake photo flow:
 5. Removing the photo, or deleting the account (via the admin client, before the auth
    user), deletes the file.
 
+### Knowledge base (Phase 3)
+Structured entries in `src/lib/knowledge/entries.ts`, each with evidence level, caveats,
+sources (with a verified flag) and review status. `selectKnowledge` picks at most two
+**usable** entries (approved, named reviewer, date, all citations verified) whose keywords
+appear in his last three messages; `renderKnowledge` adds them to the prompt before the
+safety instructions. All entries are drafts today. See `docs/knowledge/REVIEW.md`.
+
+### Personalization (Phase 3)
+Fixed-vocabulary preferences on `profiles` (tone, focus, next-step frequency, faith,
+topics to avoid, life context), each mapped to a reviewed instruction by
+`renderPreferences`. Life context is included only with memory on. Preferences go into the
+text prompt (before safety) and into Retell calls as the `{{preferences}}` dynamic variable.
+"Tune how he talks to me" (`/api/preferences/suggest`) sends the in-browser conversation
+once to the model, which may suggest up to three style changes (never faith or life
+context); `parseSuggestions` validates every field and value and screens the reasons; no
+suggestions are made if any of his messages shows risk. He accepts or skips each.
+
+### Security headers and CI
+`next.config.ts` sends the headers from `src/lib/security-headers.ts` on every response. The
+content security policy's `connect-src` lists the only outside services the browser talks
+to: Supabase, `api.retellai.com` and `*.livekit.cloud` (Retell's voice media servers). If
+Retell adds a new host, voice will fail with a "Content Security Policy" error in the
+browser console; add the host there. All zod imports go through `src/lib/zod.ts` (lint
+enforces it). `.github/workflows/ci.yml` runs every check on each pull request.
+
+### Rate limits
+Each costly request first calls the database function `consume_rate_limit(action)` as the
+signed-in user (`src/lib/rate-limit.ts`). It counts uses per UTC minute and UTC day in
+`rate_limits`, under an advisory lock so parallel requests can't slip past, and refuses
+without counting once a limit is reached, saying how long until the window resets. The
+limits are defined inside the function. For chat, tailoring and suggestions the check runs
+after the safety screen and just before the model call, so a crisis message is never
+blocked. Voice, photo upload and data export check before doing any work. A refusal returns
+429 with a `Retry-After` header and a calm message the screens show as-is; if the check
+itself errors, the request goes ahead and a warning is logged.
+
 ## Data model
 
 | Table | Purpose | Access |
@@ -117,6 +156,7 @@ The keepsake photo flow:
 | `growth_plans` | topic, focus, status | user CRUD on own rows |
 | `plan_steps` | step text, source (library/ai/user), done, note | user CRUD on own rows; insert/update also require the parent plan to be the user's |
 | `storage.objects` (bucket `keepsakes`) | keepsake photo, one per user | user reads/writes only `<own id>/…`; private bucket |
+| `rate_limits` | usage counts per action, minute and day (no content) | no direct access; only through `consume_rate_limit` |
 | `reflections` | five 1–5 ratings (nullable), notes, proud-of | user read/insert/delete own; no edits |
 
 ## Provider abstraction
@@ -135,7 +175,8 @@ reports missing services instead of throwing, so the UI can say "not configured"
 
 ## Planned (later phases)
 - Possible later opt-in: AI-suggested memories he approves.
-- Phase 3, remaining: expanded reviewed knowledge base, advanced personalization, further
-  safety evaluation.
+- Clinician review and approval of knowledge-base entries.
+- A model-based risk check, pending red-team results (see docs/safety/README.md).
+- Knowledge and per-turn safety for voice via Retell's custom LLM integration.
 - Voice safety parity: route voice turns through the same safety pipeline (Retell custom
   LLM websocket) or add post-call review.

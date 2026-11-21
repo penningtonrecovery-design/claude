@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { MAX_FOCUS_CHARS, MAX_PLAN_STEPS, MAX_STEP_CHARS, MIN_PLAN_STEPS, TOPICS } from "./library";
 import { REFLECTION_AREAS } from "./reflection";
 

@@ -21,6 +21,15 @@ app starts calls with that agent; it doesn't create or change the agent itself.
    ```
 
    The app sends `user_name` as a dynamic variable when it starts each call.
+   Also add this line, so voice calls follow the preferences he set in Settings:
+
+   ```
+   {{preferences}}
+   ```
+
+   The app fills it with his style preferences (and life context, only if memory is on),
+   or "No special preferences." Reviewed knowledge-base entries are not sent to voice
+   calls yet: they are chosen per message, which needs Retell's custom LLM integration.
 4. Set a short, warm opening line, for example:
    *"Hello, {{user_name}}. I'm glad you're here. What's on your mind today?"*
 
@@ -29,7 +38,14 @@ app starts calls with that agent; it doesn't create or change the agent itself.
 Pick a warm, mature male voice and listen to a few samples before deciding. Aim for calm
 and unhurried, not theatrical. Slightly slower speech often suits the persona.
 
-## 3. Privacy settings (important)
+## 3. Call length limit (important)
+
+In the agent's call settings, set the **maximum call duration** to **30 minutes**. The app
+allows each person 10 voice calls a day (and 3 a minute), but only Retell can end a call
+that runs long, so this setting is what caps the cost of a single call. Retell's dashboard
+wording may differ slightly; look for "max call duration" or "end call after".
+
+## 4. Privacy settings (important)
 
 Review the agent's **data storage** settings. Retell can store call recordings and
 transcripts. Pick the most limited option that still lets you operate the service (the
@@ -40,14 +56,14 @@ SDK lists options such as `everything`, `everything_except_pii` and
 Also check Retell's data retention, its subprocessors, and whether you need a data
 processing agreement.
 
-## 4. Allowed domains and keys
+## 5. Allowed domains and keys
 
 - Put the **API key** in `RETELL_API_KEY` and the agent ID in `RETELL_AGENT_ID` in
   `.env.local` (and in Vercel's environment variables later). The key never reaches the
   browser: the app's `/api/voice/web-call` route adds it on the server.
 - The browser SDK only sees short-lived call credentials.
 
-## 5. Test it
+## 6. Test it
 
 1. `npm run dev`, sign in, finish onboarding, choose **Talk**, press **Start talking**.
 2. Allow the microphone. You should hear the agent's opening line.

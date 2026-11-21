@@ -51,8 +51,9 @@ export function CompanionSettings({
           {AVATARS.map((a) => (
             <label key={a.id} className={optionClass} title={a.description}>
               <input type="radio" name="choice" value={`avatar:${a.id}`} defaultChecked={current === `avatar:${a.id}`} className="sr-only" />
-              <AvatarPortrait id={a.id} className="h-20 w-20" title={a.name} />
+              <AvatarPortrait id={a.id} className="h-20 w-20" title={`${a.name}, ${a.background}`} />
               <span className="text-sm text-cream">{a.name}</span>
+              <span className="text-xs text-dust">{a.background}</span>
             </label>
           ))}
           <label className={`${optionClass} ${photoUrl ? "" : "cursor-not-allowed opacity-50"}`}>
@@ -66,6 +67,9 @@ export function CompanionSettings({
             <span className="text-sm text-cream">Your photo</span>
           </label>
         </fieldset>
+        <p className="text-xs leading-relaxed text-dust">
+          The grandfather portraits are AI-generated. None of them is a real person.
+        </p>
         <div className="flex items-center gap-3">
           <button type="submit" disabled={pending} className={smallButton}>Save</button>
           {state?.ok && <span className="text-sm text-moss">{state.ok}</span>}

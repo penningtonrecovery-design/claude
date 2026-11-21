@@ -3,6 +3,7 @@ import { getChatProvider } from "@/lib/ai";
 import { getAiConfig } from "@/lib/config";
 import { tailorSteps } from "@/lib/growth/tailor";
 import { tailorRequestSchema } from "@/lib/growth/schemas";
+import { consumeRateLimit, limitMessage, retryAfterHeader } from "@/lib/rate-limit";
 import { moderateWithOpenAI } from "@/lib/safety/moderation";
 import { getCurrentUser } from "@/lib/supabase/server";
 
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     const outcome = await tailorSteps(parsed.data.topic, parsed.data.focus, {
       provider: getChatProvider(),
       moderate: ai ? (text) => moderateWithOpenAI(ai.apiKey, text) : undefined,
+      checkLimit: () => consumeRateLimit(supabase, "tailor"),
     });
     switch (outcome.kind) {
       case "steps":
@@ -34,6 +36,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "ai_not_configured" }, { status: 503 });
       case "unusable":
         return NextResponse.json({ error: "unusable" }, { status: 502 });
+      case "rate_limited":
+        return NextResponse.json(
+          { error: "rate_limited", message: limitMessage("tailor", outcome.limit) },
+          { status: 429, headers: retryAfterHeader(outcome.limit) },
+        );
     }
   } catch {
     console.error("[plans] tailoring request failed");

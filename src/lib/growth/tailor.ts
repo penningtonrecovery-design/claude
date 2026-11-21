@@ -1,6 +1,7 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import type { ChatProvider } from "@/lib/ai/types";
 import { FATHERLY_FRIEND_PROMPT } from "@/lib/persona/system-prompt";
+import type { RateLimitResult } from "@/lib/rate-limit";
 import {
   classifyMessage,
   classifySuggestion,
@@ -13,7 +14,8 @@ export type TailorOutcome =
   | { kind: "steps"; steps: string[] }
   | { kind: "crisis" }
   | { kind: "not_configured" }
-  | { kind: "unusable" };
+  | { kind: "unusable" }
+  | { kind: "rate_limited"; limit: Extract<RateLimitResult, { allowed: false }> };
 
 const modelOutputSchema = z.object({
   steps: z.array(z.string().trim().min(1)).min(1).max(10),
@@ -58,6 +60,8 @@ export async function tailorSteps(
   deps: {
     provider: ChatProvider | null;
     moderate?: (text: string) => Promise<SafetyResult | null>;
+    // Counts one model request; called only after his words are screened.
+    checkLimit?: () => Promise<RateLimitResult>;
   },
 ): Promise<TailorOutcome> {
   // Screen what he wrote before anything else.
@@ -69,6 +73,11 @@ export async function tailorSteps(
   if (safety.level === "crisis") return { kind: "crisis" };
 
   if (!deps.provider) return { kind: "not_configured" };
+
+  if (deps.checkLimit) {
+    const limit = await deps.checkLimit();
+    if (!limit.allowed) return { kind: "rate_limited", limit };
+  }
 
   const { system, user } = buildTailorPrompt(topic, focus);
   const raw = await deps.provider.generate({ system, messages: [{ role: "user", content: user }] });

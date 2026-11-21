@@ -6,13 +6,16 @@ vi.mock("@/lib/supabase/server", () => ({ getCurrentUser: () => getCurrentUser()
 
 const { POST } = await import("./route");
 
-function fakeSupabase(displayName: string | null) {
+function fakeSupabase(displayName: string | null, allowed = true) {
   const chain = {
     select: () => chain,
     eq: () => chain,
     maybeSingle: async () => ({ data: { display_name: displayName } }),
   };
-  return { from: () => chain };
+  const limit = allowed
+    ? { allowed: true, limit_window: null, retry_after_seconds: 0 }
+    : { allowed: false, limit_window: "day", retry_after_seconds: 7200 };
+  return { from: () => chain, rpc: async () => ({ data: [limit], error: null }) };
 }
 
 function request(body: unknown = { agent_id: "agent_chosen_by_browser", metadata: { evil: true } }) {
@@ -46,6 +49,17 @@ describe("POST /api/voice/web-call", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it("refuses a call over the daily limit without contacting Retell", async () => {
+    getCurrentUser.mockResolvedValue({ supabase: fakeSupabase(null, false), user: { id: "u1" } });
+    const res = await POST(request());
+    expect(res.status).toBe(429);
+    expect(res.headers.get("Retry-After")).toBe("7200");
+    const body = await res.json();
+    expect(body.error_message).toContain("today's limit for voice conversations");
+    expect(body.error_message).toContain("988");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("reports when voice is not configured", async () => {
     vi.stubEnv("RETELL_API_KEY", "");
     getCurrentUser.mockResolvedValue({ supabase: fakeSupabase(null), user: { id: "u1" } });
@@ -72,7 +86,7 @@ describe("POST /api/voice/web-call", () => {
     expect(init.headers["X-Retell-Client-JS-SDK-Version"]).toBe("3.0.3");
     expect(JSON.parse(init.body)).toEqual({
       agent_id: "agent_from_server",
-      retell_llm_dynamic_variables: { user_name: "Marcus" },
+      retell_llm_dynamic_variables: { user_name: "Marcus", preferences: "No special preferences." },
       metadata: { app: "fatherly-friend" },
     });
 

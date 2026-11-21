@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:rls": "bash scripts/test-rls.sh",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "voice-prompt": "node --no-warnings -e \"import('./src/lib/persona/system-prompt.ts').then(m=>console.log(m.FATHERLY_FRIEND_PROMPT))\"",
     "eval:safety": "WRITE_SCORECARD=1 vitest run src/lib/safety/eval",
     "redteam": "vitest run --config vitest.redteam.config.ts"
